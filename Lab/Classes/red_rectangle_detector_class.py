@@ -2,6 +2,10 @@ import cv2
 import numpy as np
 
 class RedRectangle:
+    
+    def __init__(self) -> None:
+        self.contours = None
+        self.middle_point = (0, 0)
 
     # TODO: HSV values as input?
     def detect_red_stick(self, frame):
@@ -46,5 +50,18 @@ class RedRectangle:
 
             # Draw the rotated rectangle
             cv2.drawContours(frame, [box], 0, (0, 255, 0), 2)
+
+            # Fin the center
+            x, y, w, h = cv2.boundingRect(contour)
+    
+            # Calculate the middle point of the rectangle
+            middle_x = x + w // 2
+            middle_y = y + h // 2
+            self.middle_point = (middle_x, middle_y)
+            
+            # Draw origin and mouse position on the frame
+            cv2.circle(frame, self.middle_point, 5, (255, 0, 0), 3)
+
+
 
         return frame

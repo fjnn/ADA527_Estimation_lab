@@ -46,7 +46,6 @@ while True:
     detected_frame = rectangle_detector.detect_red_stick(undistorted_frame)
 
     # Display the frame
-    cv2.imshow('Frame', undistorted_frame)
     cv2.imshow('Frame', detected_frame)
 
     # Exit if 'q' is pressed
