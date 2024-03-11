@@ -5,21 +5,19 @@ import os
 
 # Locate your camera_calibration.yaml file
 cwd = os.getcwd()
-file_path = cwd+'\\Lab\\'
+calibration_path = cwd+'\\Lab\\calibration\\'
 
-with open(os.path.join(file_path, 'camera_calibration.yaml'), 'r') as stream:
+with open(os.path.join(calibration_path, 'camera_calibration.yaml'), 'r') as stream:
     calibration_data = yaml.safe_load(stream)
 
 # print(calibration_data)
 camera_matrix = np.array(calibration_data['camera_matrix'])
 dist_coeff = np.array(calibration_data['dist_coeff'])
 
-
-input_video_path = 'output_video.mp4'
+video_path = cwd+'\\Lab\\recorded_data\\'
+input_video_path = video_path+'output_video.mp4'
 cap = cv2.VideoCapture(input_video_path)
 
-print(cap)
-exit()
 
 origin_offset_y = 275
 origin_offset_x = 10
@@ -36,18 +34,11 @@ while True:
 
     # Undistort the frame
     undistorted_frame = cv2.undistort(frame, camera_matrix, dist_coeff)
-
-    # Get mouse position (if available)
-    if mouse_x is not None and mouse_y is not None:
-        # Convert mouse position to world coordinates
-        mouse_position = np.array([[mouse_x-origin_offset_x, mouse_y-origin_offset_y]], dtype=np.float32)
-        mouse_position = cv2.undistortPoints(mouse_position, camera_matrix, dist_coeff)
-        mouse_world_x, mouse_world_y = mouse_position[0, 0]
-
-        # Draw origin and mouse position on the frame
-        cv2.circle(undistorted_frame, origin, 5, (0, 0, 255), -1)
-        cv2.circle(undistorted_frame, (mouse_x, mouse_y), 5, (0, 255, 0), -1)
-        cv2.putText(undistorted_frame, f'World Coords: ({mouse_world_x:.2f}, {mouse_world_y:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+    
+    # Draw origin and mouse position on the frame
+    cv2.circle(undistorted_frame, origin, 5, (0, 0, 255), -1)
+        # cv2.circle(undistorted_frame, (mouse_x, mouse_y), 5, (0, 255, 0), -1)
+        # cv2.putText(undistorted_frame, f'World Coords: ({mouse_world_x:.2f}, {mouse_world_y:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
     # Display the frame
     cv2.imshow('Frame', undistorted_frame)
