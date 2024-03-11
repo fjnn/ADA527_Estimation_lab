@@ -20,21 +20,20 @@ imgpoints = []  # 2d points in image plane.
 
 # Locate your calibration pictures
 cwd = os.getcwd()
+file_path = cwd+'\\Lab\\calibration\\'
 images=[]
-for file in os.listdir(cwd):
+for file in os.listdir(file_path):
     if file.endswith('.jpg') or file.endswith('.JPG'):
-        images.append(os.path.join(cwd, file))
+        images.append(os.path.join(file_path, file))
+        print(os.path.join(file_path, file))
 
 found = 0
 
 img = cv2.imread(images[0])
-print(img)
-exit()
+
 for fname in images:
     # Here, 10 can bcde changed to whatever number you like to choose
-    print(fname)
-    exit()
-    img = cv2.imread(cwd+fname)  # Capture frame-by-frame
+    img = cv2.imread(fname)  # Capture frame-by-frame
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # Find the chess board corners
@@ -62,7 +61,7 @@ ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.sh
 data = {'camera_matrix': np.asarray(mtx).tolist(), 'dist_coeff': np.asarray(dist).tolist()}
 
 # and save it to a file
-with open("calibration_matrix.yaml", "w") as f:
+with open(file_path+"calibration_matrix.yaml", "w") as f:
     yaml.dump(data, f)
 
 # done
