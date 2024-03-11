@@ -28,6 +28,9 @@ class RedRectangle:
         # Find contours in the mask
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+        max_area = -1
+        max_contour = None
+
         # Iterate through the contours
         for contour in contours:
 
@@ -42,9 +45,19 @@ class RedRectangle:
             #     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
             #     print("w:", w, "    h:", h)
 
+            # Calculate the area of the contour
+            area = cv2.contourArea(contour)
+            
+            # Check if the current contour has a larger area than the maximum found so far
+            if area > max_area:
+                max_area = area
+                max_contour = contour
+
+        # for contour in contours:
+
             ## 2) Parallelogram -- thats what we need
             # Fit a rotated rectangle to the contour
-            rect = cv2.minAreaRect(contour)
+            rect = cv2.minAreaRect(max_contour)
             box = cv2.boxPoints(rect)
             box = np.int0(box)
 
@@ -52,7 +65,7 @@ class RedRectangle:
             cv2.drawContours(frame, [box], 0, (0, 255, 0), 2)
 
             # Fin the center
-            x, y, w, h = cv2.boundingRect(contour)
+            x, y, w, h = cv2.boundingRect(max_contour)
     
             # Calculate the middle point of the rectangle
             middle_x = x + w // 2
