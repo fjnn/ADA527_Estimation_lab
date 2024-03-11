@@ -1,0 +1,1 @@
+from .red_rectangle_detector_class import RedRectangle
