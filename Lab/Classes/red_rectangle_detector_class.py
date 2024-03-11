@@ -3,6 +3,7 @@ import numpy as np
 
 class RedRectangle:
 
+    # TODO: HSV values as input?
     def detect_red_stick(self, frame):
         # Convert BGR to HSV
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
