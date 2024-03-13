@@ -38,7 +38,7 @@ def record_video(output_filename, duration):
     frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
     # Define the codec and create VideoWriter object
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
     out = cv2.VideoWriter(output_filename, fourcc, 60.0, (frame_width, frame_height))
 
     start_time = cv2.getTickCount()
@@ -75,7 +75,7 @@ def record_video(output_filename, duration):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    output_filename = 'output_video.mp4'
+    output_filename = 'output_video2.mp4'
     duration = 30  # Duration in seconds
     record_video(output_filename, duration)
     # output_image = r'C:\Users\gizem\Desktop\output_imagee.jpg'

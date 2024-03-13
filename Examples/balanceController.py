@@ -112,7 +112,7 @@ def createSquareWave(squareWaveFreq,squareWaveAmplitude, frequency, timeSamples)
 
 def Balance_controller():
 
-    run_time = 20 # seconds
+    run_time = 5 # seconds
 
     print('PD Controller Starting... will run for {} seconds'.format(run_time))
     #print('time    theta rad      theta dot      voltage in     voltage out       Error')
@@ -122,7 +122,7 @@ def Balance_controller():
     task = None
     
     #If you want to change any board-specific options, it can be done here
-    #card.set_card_specific_options("deadband_compensation=0.65, pwm_en=0, enc0_velocity=3.0, enc1_velocity=3.0", 4)
+    #card.set_card_specific_options("deadband_compensation=0.65, pwm_en=0, enc0_velocity=3q.0, enc1_velocity=3.0", 4)
     card.set_card_specific_options("deadband_compensation=0.65", MAX_STRING_LENGTH)
     
     # Create a list of channels to access
@@ -207,6 +207,8 @@ def Balance_controller():
             # Counts to radians
             theta_rad = -2*math.pi/512/4*encoder_buffer[0]
             alpha_rad = (2*math.pi/512/4*encoder_buffer[1]) % (2 * math.pi) - math.pi
+
+            print("theta: ", degrees(theta_rad), "   alpha: ", degrees(alpha_rad))
 
             # Calculate angular velocities with filter of 50 rad
             theta_dot, state_theta_dot = ddt_filter(theta_rad, state_theta_dot, 50, 1/frequency)
