@@ -30,8 +30,9 @@ while True:
     detected_frame = rectangle_detector.detect_red_stick(undistorted_frame)
     com_pixels = rectangle_detector.get_com_pixels()
     com_coordinates = pixel_capture.convert_pixels_to_world_coordinates(undistorted_frame, com_pixels)
-    com_coordinates = pixel_capture.test_rotation(com_coordinates)
     print("CoM world coordinates:", com_coordinates)
+
+    cv2.putText(undistorted_frame, f'World Coords: ({com_coordinates[0]:.2f}, {com_coordinates[1]:.2f}, {com_coordinates[2]:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
     # Display the frame
     cv2.imshow('Frame', detected_frame)

@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import yaml
 import os
+import spatialmath.base as base
 
 # Locate your camera_calibration.yaml file
 cwd = os.getcwd()+'\\Lab\\calibration\\'
@@ -48,10 +49,13 @@ while True:
         mouse_position = cv2.undistortPoints(mouse_position, camera_matrix, dist_coeff)
         mouse_world_x, mouse_world_y = mouse_position[0, 0]
 
+        R_camera_q = np.matmul(base.rotx(-np.pi/2), base.roty(-np.pi/2))
+        transformed_coordinates = np.matmul(R_camera_q, np.array([mouse_world_x, mouse_world_y, 0]))
+
         # Draw origin and mouse position on the frame
         cv2.circle(undistorted_frame, origin, 5, (0, 0, 255), -1)
         cv2.circle(undistorted_frame, (mouse_x, mouse_y), 5, (0, 255, 0), -1)
-        cv2.putText(undistorted_frame, f'World Coords: ({mouse_world_x:.2f}, {mouse_world_y:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        cv2.putText(undistorted_frame, f'World Coords: ({transformed_coordinates[0]:.2f}, {transformed_coordinates[1]:.2f}, {transformed_coordinates[2]:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
     # Display the frame
     cv2.imshow('Frame', undistorted_frame)
