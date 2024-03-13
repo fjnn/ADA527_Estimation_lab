@@ -1,3 +1,5 @@
+
+# https://www.geeksforgeeks.org/realtime-distance-estimation-using-opencv-python/
 # install opencv "pip install opencv-python" 
 import cv2 
 
@@ -26,6 +28,7 @@ def Focal_Length_Finder(measured_distance, real_width, width_in_rf_image):
 
 	# finding the focal length 
 	focal_length = (width_in_rf_image * measured_distance) / real_width 
+	print(focal_length)
 	return focal_length 
 
 # distance estimation function 

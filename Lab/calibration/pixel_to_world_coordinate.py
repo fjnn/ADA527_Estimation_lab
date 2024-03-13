@@ -6,6 +6,10 @@ import yaml
 import os
 import spatialmath.base as base
 
+from Classes import RedRectangle
+
+rectangle_detector = RedRectangle()
+
 # Locate your camera_calibration.yaml file
 cwd = os.getcwd()+'\\Lab\\calibration\\'
 
@@ -34,6 +38,7 @@ def mouse_move(event, x, y, flags, param):
 # Set mouse callback
 cv2.namedWindow('Frame')
 cv2.setMouseCallback('Frame', mouse_move)
+
 
 while True:
     # Capture frame from webcam
