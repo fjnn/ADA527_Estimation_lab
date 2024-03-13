@@ -65,7 +65,38 @@ class Qube:
         self.other_channels_read = np.array([14000, 14001], dtype=np.uint32)
         self.other_channels_write = np.array([11000, 11001, 11002], dtype=np.uint32)
         self.other_buffer = np.zeros(len(self.other_channels_read), dtype=np.float64)
+
+        #If you want to change any board-specific options, it can be done here
+        #card.set_card_specific_options("deadband_compensation=0.65, pwm_en=0, enc0_velocity=3q.0, enc1_velocity=3.0", 4)
+        self.card.set_card_specific_options("deadband_compensation=0.65", MAX_STRING_LENGTH) 
+
+        try:
+            # reset both encoders to values of 0
+            self.card.set_encoder_counts(self.encoder_channels_read, len(self.encoder_channels_read), np.array([0, 0], dtype=np.int32))
+            
+            # set LED's [Red, Green, Blue]
+            self.card.write_other(self.other_channels_write, len(self.other_channels_write), np.array([1,1,0], dtype=np.float64))  
+
+        except Exception as e: 
+            self.exception_handler()
+
+            
         print("initialized")
+
+    
+    def exception_handler(self):
+        traceback.print_exc()
+            
+        # Something went wrong. Try to shutdown cleanly.    
+        if (self.task):
+            print('Stopping task')
+        
+            self.card.task_stop(self.task)
+            self.card.task_delete(self.task)    
+            
+        print('Closing card')
+        self.card.close()
+
 
     def close_all(self):  
         try:
@@ -81,40 +112,52 @@ class Qube:
             
             print('Have a nice day!')
         except Exception as e: 
-        
-            traceback.print_exc()
-            
-            # Something went wrong. Try to shutdown cleanly.    
-            if (self.task):
-                print('Stopping task')
-            
-                self.card.task_stop(self.task)
-                self.card.task_delete(self.task)    
-                
-                
-            print('Closing card')
-            self.card.close()
+            self.exception_handler()
 
+
+    def read_encoders_once(self):
+        print("Started")     
+
+        try:
+        
+            # Buffer for any hiccups in Windows timing
+            samples_in_buffer = 1000 
+            
+            # Control loop frequency
+            frequency = 1000 # Hz
+            samples = 2**32-1 # Run indefinitely
+            
+            # Create a task for timebase reads
+            self.task = self.card.task_create_reader(samples_in_buffer,
+                                        analog_channels=None, num_analog_channels=0,
+                                        encoder_channels=self.encoder_channels_read, num_encoder_channels=len(self.encoder_channels_read),
+                                        digital_channels=None, num_digital_channels=0,
+                                        other_channels=self.other_channels_read, num_other_channels=len(self.other_channels_read))
+                                    
+            # print("so far so good")
+
+            # Start timing loop
+            self.card.task_start(self.task, 0, frequency, samples)   
+
+            # read from Qube (we only need the encoders)
+            self.card.task_read(self.task, 1, analog_buffer=None, encoder_buffer=self.encoder_buffer, digital_buffer=None, other_buffer=self.other_buffer)
+            
+            # Counts to radians
+            theta_rad = -2*math.pi/512/4*self.encoder_buffer[0]
+            alpha_rad = (2*math.pi/512/4*self.encoder_buffer[1]) % (2 * math.pi) - math.pi
+
+            print("theta: ", degrees(theta_rad), "   alpha: ", degrees(alpha_rad))
+        except Exception as e: 
+            self.exception_handler()
 
 
     def read_encoders(self):
 
         run_time = 5 # seconds
-        print("Started")
-
-        
-        #If you want to change any board-specific options, it can be done here
-        #card.set_card_specific_options("deadband_compensation=0.65, pwm_en=0, enc0_velocity=3q.0, enc1_velocity=3.0", 4)
-        self.card.set_card_specific_options("deadband_compensation=0.65", MAX_STRING_LENGTH)        
+        print("Started")     
 
         try:
         
-            # reset both encoders to values of 0
-            self.card.set_encoder_counts(self.encoder_channels_read, len(self.encoder_channels_read), np.array([0, 0], dtype=np.int32))
-            
-            # set LED's [Red, Green, Blue]
-            self.card.write_other(self.other_channels_write, len(self.other_channels_write), np.array([1,1,0], dtype=np.float64))  
-            
             # Buffer for any hiccups in Windows timing
             samples_in_buffer = 1000 
             
@@ -136,9 +179,6 @@ class Qube:
 
             timeSamples = run_time*frequency
 
-            squareWaveFreq = 0.4
-            squareWaveAmplitude = 0.5
-            ref = np.zeros(timeSamples)
 
             # Start control loop
             for index in range(timeSamples):
@@ -154,15 +194,7 @@ class Qube:
 
             print("Shutting down...")
           
-            # Set LED's
-            self.card.write_other(self.other_channels_write, len(self.other_channels_write), np.array([1,0,0], dtype=np.float64))  
-            
-            # Stop then destroy task
-            self.card.task_stop(self.task)
-            self.card.task_delete(self.task)  
-
-            # Close HIL device
-            self.card.close()
+            # self.close_all()
             
             print('Have a nice day!')
 
@@ -170,16 +202,4 @@ class Qube:
             return
 
         except Exception as e: 
-            
-            traceback.print_exc()
-            
-            # Something went wrong. Try to shutdown cleanly.    
-            if (self.task):
-                print('Stopping task')
-            
-                self.card.task_stop(self.task)
-                self.card.task_delete(self.task)    
-                
-                
-            print('Closing card')
-            self.card.close()
+            self.exception_handler()

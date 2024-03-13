@@ -208,7 +208,6 @@ def Balance_controller():
             theta_rad = -2*math.pi/512/4*encoder_buffer[0]
             alpha_rad = (2*math.pi/512/4*encoder_buffer[1]) % (2 * math.pi) - math.pi
 
-            print("theta: ", degrees(theta_rad), "   alpha: ", degrees(alpha_rad))
 
             # Calculate angular velocities with filter of 50 rad
             theta_dot, state_theta_dot = ddt_filter(theta_rad, state_theta_dot, 50, 1/frequency)
@@ -218,6 +217,8 @@ def Balance_controller():
 
             #print(" theta_dot:", theta_dot)
             #print(" alpha_dot:", alpha_dot)
+            # print("theta: ", degrees(theta_rad), "   alpha: ", degrees(alpha_rad))
+            # print("theta_dot: ", degrees(theta_dot), "   alpha_dof: ", degrees(alpha_dot))
             
             # Calculate control gains
             ArmAngleProportionalGain = -2
