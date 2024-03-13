@@ -4,46 +4,33 @@ import yaml
 import os
 
 from Classes import RedRectangle 
+from Classes import PixelToWorldCoordinates
 
-# Locate your camera_calibration.yaml file
+
 cwd = os.getcwd()
-calibration_path = cwd+'\\Lab\\calibration\\'
-
-with open(os.path.join(calibration_path, 'camera_calibration.yaml'), 'r') as stream:
-    calibration_data = yaml.safe_load(stream)
-
-# print(calibration_data)
-camera_matrix = np.array(calibration_data['camera_matrix'])
-dist_coeff = np.array(calibration_data['dist_coeff'])
 
 video_path = cwd+'\\Lab\\recorded_data\\'
 input_video_path = video_path+'output_video.mp4'
-cap = cv2.VideoCapture(input_video_path)
-
-
-origin_offset_y = 275
-origin_offset_x = 10
-
-# Define origin point
-origin = (int(camera_matrix[0, 2])+origin_offset_x, int(camera_matrix[1, 2])+origin_offset_y)
-
-# Center of Mass of the pendulum
-com_x, com_y = None, None
+cap = cv2.VideoCapture(input_video_path) ## Use cv2.VideoCapture(1) for real camera.
 
 rectangle_detector = RedRectangle()
+pixel_capture = PixelToWorldCoordinates(cap=cap, cwd=cwd, calib_file_name='calibration_matrix.yaml')
 
 while True:
     # Capture frame from webcam
-    ret, frame = cap.read()
+    ret, frame = pixel_capture.cap.read()
 
     # Undistort the frame
-    undistorted_frame = cv2.undistort(frame, camera_matrix, dist_coeff)
+    undistorted_frame = cv2.undistort(frame, pixel_capture.camera_matrix, pixel_capture.dist_coeff)
 
     # Draw origin and mouse position on the frame
-    cv2.circle(undistorted_frame, origin, 5, (0, 0, 255), -1)
+    cv2.circle(undistorted_frame, pixel_capture.origin, 5, (0, 0, 255), -1)
 
     # Detect the red stick
     detected_frame = rectangle_detector.detect_red_stick(undistorted_frame)
+    com_pixels = rectangle_detector.get_com_pixels()
+    com_coordinates = pixel_capture.convert_pixels_to_world_coordinates(undistorted_frame, com_pixels)
+    print("CoM world coordinates:", com_coordinates)
 
     # Display the frame
     cv2.imshow('Frame', detected_frame)

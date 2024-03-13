@@ -75,6 +75,7 @@ class RedRectangle:
             # Draw origin and mouse position on the frame
             cv2.circle(frame, self.middle_point, 5, (255, 0, 0), 3)
 
-
-
         return frame
+    
+    def get_com_pixels(self):
+        return self.middle_point
