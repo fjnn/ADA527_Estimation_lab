@@ -30,6 +30,7 @@ while True:
     detected_frame = rectangle_detector.detect_red_stick(undistorted_frame)
     com_pixels = rectangle_detector.get_com_pixels()
     com_coordinates = pixel_capture.convert_pixels_to_world_coordinates(undistorted_frame, com_pixels)
+    com_coordinates = pixel_capture.test_rotation(com_coordinates)
     print("CoM world coordinates:", com_coordinates)
 
     # Display the frame

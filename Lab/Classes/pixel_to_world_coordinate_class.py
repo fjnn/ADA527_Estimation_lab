@@ -4,6 +4,8 @@ import cv2
 import numpy as np
 import yaml
 import os
+from roboticstoolbox import ET, Link
+import spatialmath.base as base
 
 class PixelToWorldCoordinates:
     
@@ -45,11 +47,30 @@ class PixelToWorldCoordinates:
     def convert_pixels_to_world_coordinates(self, frame, pixels):
         # Convert pixels to world coordinates
         pixel_position = np.array([[pixels[0]-self.origin_offset_x, pixels[1]-self.origin_offset_y]], dtype=np.float32)
-        pixel_position = cv2.undistortPoints(pixel_position, self.camera_matrix, self.dist_coeff)
-        pixel_world_x, pixel_world_y = pixel_position[0, 0]
+        pixel_position = cv2.undistortPoints(pixel_position, self.camera_matrix, self.dist_coeff)[0][0]
+        # pixel_world_x, pixel_world_y = pixel_position[0, 0]
         return pixel_position
 
         # Draw origin and mouse position on the frame
         cv2.circle(undistorted_frame, self.origin, 5, (0, 0, 255), -1)
         cv2.circle(undistorted_frame, (pixel_world_x, pixel_world_y), 5, (0, 255, 0), -1)
         cv2.putText(undistorted_frame, f'World Coords: ({pixel_world_x:.2f}, {pixel_world_y:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+
+    def test_rotation(self, coordinates):
+        # Rotate from camera frame to qube frame
+        # T_camera_q = Link(ET.Ry(np.pi/2) * ET.Rx(np.pi/2))
+        # print(type(T_camera_q.A().R))
+        R_camera_q = np.matmul(base.roty(np.pi/2), base.rotx(np.pi/2))
+        transformed_coordinates = np.matmul(R_camera_q, np.array([coordinates[0], coordinates[1], 0]))
+        print(np.float32(transformed_coordinates[0]))
+        exit()
+        R_camera_q = T_camera_q.fkine([np.pi/2, np.pi/2])
+        # T = base.(0.3, t=[1,2])
+        print("T: ", T)
+        print("type ", type(T))
+        [R, t] = base.tr2rt(R_camera_q)
+        print(R)
+        
+        # print(type(R_camera_q.tr2rt()))
+        # return T_camera_q*np.array([coordinates[0], coordinates[1], 0])
+        return T_camera_q*np.array([0, 1, 0])

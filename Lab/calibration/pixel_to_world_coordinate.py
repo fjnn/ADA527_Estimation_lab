@@ -6,9 +6,9 @@ import yaml
 import os
 
 # Locate your camera_calibration.yaml file
-cwd = os.getcwd()
+cwd = os.getcwd()+'\\Lab\\calibration\\'
 
-with open(os.path.join(cwd, 'camera_calibration.yaml'), 'r') as stream:
+with open(os.path.join(cwd, 'calibration_matrix.yaml'), 'r') as stream:
     calibration_data = yaml.safe_load(stream)
 
 # print(calibration_data)
