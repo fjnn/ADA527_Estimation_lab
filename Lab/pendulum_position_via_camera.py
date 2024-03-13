@@ -37,9 +37,8 @@ while True:
     except ZeroDivisionError:
         distance = rectangle_detector.measured_distance
 
-    # print("distance:
-    #   ",distance, "     width:  ", face_width_in_frame)
-    print(f'Distance: {distance:.2f}')
+    print("distance:   ",distance, "     width:  ", face_width_in_frame)
+    # print(f'Distance: {distance:.2f}')
     # print(f'Width: {face_width_in_frame:.2f}')
     cv2.putText(undistorted_frame, f'World Coords: ({com_coordinates[0]:.2f}, {com_coordinates[1]:.2f}, {com_coordinates[2]:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 

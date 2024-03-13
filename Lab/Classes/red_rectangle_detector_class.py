@@ -9,10 +9,10 @@ class RedRectangle:
         self.height = 130 #mm
         self.width = 10 #mm
         self.measured_distance = 205 #mm
-        self.focal_corrector = 1
-        self.initial_width_pixels = 678
+        self.initial_width_pixels = 24
         self.measured_width_pixels = 0
-        self.focal_length = (self.initial_width_pixels * self.measured_distance)/ self.width
+        self.focal_length = (self.initial_width_pixels * self.measured_distance) / self.width 
+	
 
     # TODO: HSV values as input?
     def detect_red_stick(self, frame):
@@ -73,8 +73,15 @@ class RedRectangle:
 
             # Fin the center
             x, y, w, h = cv2.boundingRect(max_contour)
-            self.measured_width_pixels = abs(w-x)
-            # print("w: ", w, "   x: ", x, "   abs: ", self.measured_width_pixels)
+            # Get the endpoints of the bounding rectangle
+            top_left = (x, y)
+            top_right = (x + w, y)
+            bottom_left = (x, y + h)
+            bottom_right = (x + w, y + h)
+
+            # Calculate the distance between the top and bottom sides
+            self.measured_width_pixels = np.sqrt((bottom_right[0] - bottom_left[0])**2 + (bottom_right[1] - bottom_left[1])**2)
+            # self.measured_width_pixels = np.sqrt((bottom_right[0] - bottom_left[0])**2 + (bottom_right[1] - bottom_left[1])**2)
     
             # Calculate the middle point of the rectangle
             middle_x = x + w // 2
@@ -90,9 +97,10 @@ class RedRectangle:
         return self.middle_point
     
     def get_stick_width_in_pixels(self):
-        return self.measured_width_pixels/self.focal_corrector
+        return self.measured_width_pixels
     
     # distance estimation function 
     def distance_finder(self, face_width_in_frame):  
-        distance = (self.width * self.focal_length)/face_width_in_frame 
+        # distance = (self.width * self.focal_length)/face_width_in_frame 
+        distance = (self.width * self.focal_length)/face_width_in_frame
         return distance 

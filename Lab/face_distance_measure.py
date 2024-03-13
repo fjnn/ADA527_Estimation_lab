@@ -28,14 +28,13 @@ def Focal_Length_Finder(measured_distance, real_width, width_in_rf_image):
 
 	# finding the focal length 
 	focal_length = (width_in_rf_image * measured_distance) / real_width 
-	print(focal_length)
+	# print(focal_length)
 	return focal_length 
 
 # distance estimation function 
 def Distance_finder(Focal_Length, real_face_width, face_width_in_frame): 
 
 	distance = (real_face_width * Focal_Length)/face_width_in_frame 
-
 	# return the distance 
 	return distance 
 
@@ -77,8 +76,6 @@ ref_image_face_width = face_data(ref_image)
 Focal_length_found = Focal_Length_Finder( 
 	Known_distance, Known_width, ref_image_face_width) 
 
-print(Focal_length_found) 
-
 # show the reference image 
 cv2.imshow("ref_image", ref_image) 
 
@@ -106,6 +103,7 @@ while True:
 		# these arguments the Focal_Length, 
 		# Known_width(centimeters), 
 		# and Known_distance(centimeters) 
+		print("ref_image_face_width: ", ref_image_face_width, "face_width_in_frame: ", face_width_in_frame)
 		Distance = Distance_finder( 
 			Focal_length_found, Known_width, face_width_in_frame) 
 
