@@ -9,7 +9,7 @@ class RedRectangle:
         self.height = 130 #mm
         self.width = 10 #mm
         self.measured_distance = 205 #mm
-        self.initial_width_pixels = 23
+        self.initial_width_pixels = 39
         self.measured_width_pixels = 0
         self.measured_height_pixels = 0
         self.focal_length = (self.initial_width_pixels * self.measured_distance) / self.width 
@@ -93,7 +93,7 @@ class RedRectangle:
             bottom_right = box[3]
 
             # Calculate the distance between the top and bottom sides
-            self.measured_width_pixels = abs(top_left[0]-top_right[0])
+            self.measured_width_pixels = abs(min(box[:,0]) - max(box[:,0]))
             # self.measured_height_pixels = np.sqrt((top_right[0] - bottom_right[0])**2 + (top_right[1] - bottom_right[1])**2)
             # self.measured_width_pixels = np.sqrt((bottom_right[0] - bottom_left[0])**2 + (bottom_right[1] - bottom_left[1])**2)
             # Calculate the middle point of the rectangle
