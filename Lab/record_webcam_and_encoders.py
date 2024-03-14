@@ -1,32 +1,10 @@
 import cv2
+from Classes import Qube
 
-def record_image(output_filename):
-    # Open webcam
-    cap = cv2.VideoCapture(1)
-
-    img_counter = 0
-
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            print("failed to grab frame")
-            break
-        cv2.imshow("test", frame)
-
-        k = cv2.waitKey(1)
-        # Exit if 'q' is pressed
-        if k & 0xFF == ord('q'):
-            break
-        elif k%256 == 32:
-            # SPACE pressed to record image
-            img_name = output_filename.format(img_counter)
-            cv2.imwrite(img_name, frame)
-            print("{} written!".format(img_name))
-            img_counter += 1
-
-    # Release everything
-    cap.release()
-    cv2.destroyAllWindows()
+def record_encoders():
+    qube_object = Qube()
+    encoder_angles = qube_object.read_encoders_once()
+    qube_object.kinematics(theta=encoder_angles[0], alpha=encoder_angles[1])    
 
 
 def record_video(output_filename, duration):
@@ -75,7 +53,7 @@ def record_video(output_filename, duration):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    output_filename = 'output_video3.mp4'
+    output_filename = 'output_video2.mp4'
     duration = 30  # Duration in seconds
     record_video(output_filename, duration)
     # output_image = r'C:\Users\gizem\Desktop\output_imagee.jpg'
