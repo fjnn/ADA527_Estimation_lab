@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from kalman_filter import KalmanFilter
+from Lab.Classes.kalman_filter_class import KalmanFilter
 
 # PARAMETERS
 
