@@ -17,7 +17,7 @@ with open(os.path.join(cwd, 'calibration_matrix.yaml'), 'r') as stream:
 camera_matrix = np.array(calibration_data['camera_matrix'])
 dist_coeff = np.array(calibration_data['dist_coeff'])
 
-com_world_coord = np.array([-84.0, -30.0, 191.0])
+com_world_coord = np.array([21.8988748,  62.00489438, 87.29877163])
 
 img = cv2.imread(cwd+'output_image_qube.jpg')
 origin_offset_y = 275
@@ -35,7 +35,7 @@ image_coords = np.round(image_coords).astype(int)
 # Print the result
 print("World coordinates:", com_world_coord)
 print("Image coordinates:", image_coords)
-removed_offset = image_coords + [origin_offset_x, origin_offset_y]
+removed_offset = image_coords - [origin_offset_x, origin_offset_y]
 
 # Draw points on the image (optional)
 for i, coord in enumerate(removed_offset):

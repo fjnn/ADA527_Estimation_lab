@@ -16,6 +16,7 @@ try:
     while True:
         encoder_readings = qube_object.read_encoders_once()
         com_encoder = qube_object.kinematics(encoder_readings[0], encoder_readings[1])
+        com_encoder = qube_object.qube_to_camera(com_encoder)
         print("com_encoder: ", com_encoder, "angles: ", degrees(encoder_readings[0]), degrees(encoder_readings[1]))
         sleep(0.5)
 except KeyboardInterrupt:

@@ -24,6 +24,17 @@ class Qube:
 
     def __init__(self):
 
+        # Distances and lengths
+        # Define the transformations for qube and camera
+        self.l1 = 350 # camera-qube distance (x-axis)
+        self.l2 = 160 # camera height (z-axis)
+        self.l3 = 127 # motor height (z-axis)
+        self.l4 = 90 # pendulum offset (x-axis)
+        self.l5 = 65 # half of rod lenght (-z-axis(!))
+
+        
+        R_q_world = base.rotz(np.pi/2)
+
         # Motor
         # Resistance
         self.Rm = 7.5
@@ -214,19 +225,6 @@ class Qube:
 
     
     def kinematics(self, theta=0, alpha=0):
-        # TODO: move parameters to __init__.
-
-        # Define the transformations for qube and camera
-        l1 = 350 # camera-qube distance (x-axis)
-        l2 = 160 # camera height (z-axis)
-        l3 = 127 # motor height (z-axis)
-        l4 = 90 # pendulum offset (x-axis)
-        l5 = 65 # half of rod lenght (-z-axis(!))
-
-        ## Camera transformation
-        T_w_camera = Link(ET.tz(l1) * ET.Rz(np.pi))
-        R_q_world = base.rotz(np.pi/2)
-
 
         ## Qube+Pendulum is like the second robot
         theta = theta
@@ -236,9 +234,9 @@ class Qube:
         # robot = rtb.Robot([T_w_motor, T_motor_rodCOM], name="qube robot")
 
         # joint1 = rtb.RevoluteDH(d=0, a=0, alpha=0, offset=0, qlim=(-0.01, 0.01))
-        joint1 = rtb.RevoluteDH(d=l3, alpha=np.pi/2, a=0, offset=np.pi, qlim=(-np.pi, np.pi))
-        joint2 = rtb.RevoluteDH(d=l4, alpha=np.pi/2, a=0, offset=-np.pi, qlim=(-np.pi, np.pi))
-        ee = rtb.RevoluteDH(d=l5, a=0, alpha=0, offset=0, qlim=(-0.01, 0.01))
+        joint1 = rtb.RevoluteDH(d=self.l3, alpha=np.pi/2, a=0, offset=np.pi, qlim=(-np.pi, np.pi))
+        joint2 = rtb.RevoluteDH(d=self.l4, alpha=np.pi/2, a=0, offset=-np.pi, qlim=(-np.pi, np.pi))
+        ee = rtb.RevoluteDH(d=self.l5, a=0, alpha=0, offset=0, qlim=(-0.01, 0.01))
         qube_pendulum_robot = rtb.DHRobot([joint1, joint2, ee], name="Qube+pendulum")
 
         q = np.array([theta, alpha, 0])
@@ -246,15 +244,20 @@ class Qube:
         # print(qube_pendulum_robot.fkine(q).A())
 
         R_q_world = base.rotz(np.pi/2)
-        transformed_ee_coordinates = np.matmul(R_q_world, np.array([ee_position[0], ee_position[1], ee_position[2]]))
-        transformed_ee_coordinates = np.matmul(T_w_camera.A().R, transformed_ee_coordinates)
+        ee_coordinates = np.matmul(R_q_world, np.array([ee_position[0], ee_position[1], ee_position[2]]))
 
-        return transformed_ee_coordinates
+        return ee_coordinates
 
         qube_pendulum_robot.teach(q)
     
-    def corrector(self, ):
+    def qube_to_camera(self, ee_world_coordinates):
         '''
-        For some reason the coordinates still don't match with kinematics and camera. Temporary solution is this.
+        To visualize encoder measurements on the camera, use these coordinates.
         '''
-        pass
+        ## Camera transformation
+        # T_w_camera = Link(ET.tz(self.l1) * ET.Rz(np.pi))
+        T_w_camera = Link(ET.Ry(np.pi/2)* ET.Rx(-np.pi/2))
+        transformed_ee_coordinates = np.matmul(T_w_camera.A().R, ee_world_coordinates)
+
+        return transformed_ee_coordinates
+
