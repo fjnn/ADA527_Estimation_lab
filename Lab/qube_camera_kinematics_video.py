@@ -39,7 +39,8 @@ origin_offset_x = 10
 init_com_x = -80
 init_com_y = 0
 
-cap = cv2.VideoCapture(input_video_path) ## Use cv2.VideoCapture(1) for real camera.
+# cap = cv2.VideoCapture(input_video_path) ## Use cv2.VideoCapture(1) for real camera.
+cap = cv2.VideoCapture(1) ## Use cv2.VideoCapture(1) for real camera.
 
 rectangle_detector = RedRectangle()
 pixel_capture = PixelToWorldCoordinates(cap=cap, cwd=cwd, calib_file_name='calibration_matrix.yaml')
@@ -61,12 +62,6 @@ while True:
     # Draw origin and mouse position on the frame
     cv2.circle(undistorted_frame, pixel_capture.origin, 5, (0, 0, 255), -1)
 
-
-
-
-
-
-
 # Detect the red stick
     detected_frame = rectangle_detector.detect_red_stick(undistorted_frame)
     com_pixels = rectangle_detector.get_com_pixels()
@@ -83,20 +78,6 @@ while True:
     # print(f'Distance: {distance:.2f}')
     # print(f'Width: {face_width_in_frame:.2f}')
     cv2.putText(undistorted_frame, f'World Coords: ({com_coordinates[0]*distance:.2f}, {com_coordinates[1]*distance:.2f}, {com_coordinates[2]:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     encoder_readings = qube_object.read_encoders_once()
     com_encoder_world_frame = qube_object.kinematics(encoder_readings[0], encoder_readings[1])
