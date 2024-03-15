@@ -9,6 +9,9 @@ from Classes import Qube
 from time import sleep
 from math import degrees
 
+from Classes import RedRectangle 
+from Classes import PixelToWorldCoordinates
+
 
 cwd = os.getcwd()
 # Locate your camera_calibration.yaml file
@@ -29,24 +32,72 @@ dist_coeff = np.array(calibration_data['dist_coeff'])
 
 # com_world_coord = np.array([21.8988748,  62.00489438, 87.29877163])
 
-img = cv2.imread(cwd_calib+'output_image_qube.jpg')
-img_without_circles = img.copy()
+
 origin_offset_y = 275
 origin_offset_x = 10
 
-init_com_x = 80
-init_com_y = 160
+init_com_x = -80
+init_com_y = 0
+
+cap = cv2.VideoCapture(input_video_path) ## Use cv2.VideoCapture(1) for real camera.
+
+rectangle_detector = RedRectangle()
+pixel_capture = PixelToWorldCoordinates(cap=cap, cwd=cwd, calib_file_name='calibration_matrix.yaml')
+
 
 # Define origin point
 origin = (int(camera_matrix[0, 2])+origin_offset_x, int(camera_matrix[1, 2])+origin_offset_y)
 init_com = (int(camera_matrix[0, 2])+init_com_x, int(camera_matrix[1, 2])+init_com_y)
-cv2.circle(img, origin, 5, (0, 0, 255), -1)
-
 qube_object = Qube()
 
-key = cv2.waitKey(1) & 0xFF  # Mask with 0xFF to get the last 8 bits
-
 while True:
+
+    # Capture frame from the seected video type
+    ret, frame = pixel_capture.cap.read()
+
+    # Undistort the frame
+    undistorted_frame = cv2.undistort(frame, pixel_capture.camera_matrix, pixel_capture.dist_coeff)
+
+    # Draw origin and mouse position on the frame
+    cv2.circle(undistorted_frame, pixel_capture.origin, 5, (0, 0, 255), -1)
+
+
+
+
+
+
+
+# Detect the red stick
+    detected_frame = rectangle_detector.detect_red_stick(undistorted_frame)
+    com_pixels = rectangle_detector.get_com_pixels()
+    com_coordinates = pixel_capture.convert_pixels_to_world_coordinates(undistorted_frame, com_pixels)
+    # print("CoM world coordinates:", com_coordinates)
+    face_width_in_frame = rectangle_detector.get_stick_width_in_pixels()
+    face_height_in_frame = rectangle_detector.get_stick_height_in_pixels()
+    try:
+        distance = rectangle_detector.distance_finder(face_width_in_frame=face_width_in_frame)
+    except ZeroDivisionError:
+        distance = rectangle_detector.measured_distance
+
+    print("distance:   ",distance, "     width:  ", face_width_in_frame, "     height:  ", face_height_in_frame)
+    # print(f'Distance: {distance:.2f}')
+    # print(f'Width: {face_width_in_frame:.2f}')
+    cv2.putText(undistorted_frame, f'World Coords: ({com_coordinates[0]*distance:.2f}, {com_coordinates[1]*distance:.2f}, {com_coordinates[2]:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     encoder_readings = qube_object.read_encoders_once()
     com_encoder_world_frame = qube_object.kinematics(encoder_readings[0], encoder_readings[1])
     com_encoder_camera_frame = qube_object.qube_to_camera(com_encoder_world_frame)
@@ -64,10 +115,10 @@ while True:
 
     # Draw points on the image (optional)
     for i, coord in enumerate(removed_offset):
-        cv2.circle(img, tuple(coord.ravel()), 5, (0, 255, 0), -1)
+        cv2.circle(undistorted_frame, tuple(coord.ravel()), 5, (0, 255, 0), -1)
 
-    # Show the image with drawn points (optional)
-    cv2.imshow('Image', img)
+    # Display the frame
+    cv2.imshow('Frame', detected_frame)
 
     # Exit if 'q' is pressed
     key = cv2.waitKey(1) & 0xFF 
