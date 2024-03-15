@@ -1,4 +1,7 @@
 import cv2
+import pandas as pd
+import time
+from datetime import datetime
 
 
 class Recorder:
@@ -14,11 +17,17 @@ class Recorder:
 
         self.start_time = cv2.getTickCount()
 
+        # Initialize an empty DataFrame
+        self.df = pd.DataFrame(columns=['Time', 'pixels_from_encoder', 'pixels_from_cv2'])
         
-    def record_data(self, qube_object, pixels_from_encoder, pixels_from_cv2):
-        # encoder_angles = qube_object.read_encoders_once()
-        # qube_object.kinematics(theta=encoder_angles[0], alpha=encoder_angles[1])    
-        pass
+
+        
+    def record_data(self, pixels_from_encoder, pixels_from_cv2):
+        self.get_elapsed_time()
+        self.df.loc[len(self.df)] = {'Time': self.elapsed_time,
+                                      'pixels_from_encoder': pixels_from_encoder,
+                                      'pixels_from_cv2': pixels_from_cv2}
+       
 
 
     def record_video(self, frame):
@@ -27,19 +36,16 @@ class Recorder:
         # Write the frame to the output video file
         self.out.write(frame)
 
-        # Calculate the elapsed time
-        self.elapsed_time = (cv2.getTickCount() - self.start_time) / cv2.getTickFrequency()
+        self.get_elapsed_time()
 
         # Display the frame
         cv2.imshow('Recording...', frame)
 
 
+    def save_to_csv(self, csv_file_name):
+        self.df.to_csv(csv_file_name, index=False)
 
+    def get_elapsed_time(self):
+        # Calculate the elapsed time
+        self.elapsed_time = (cv2.getTickCount() - self.start_time) / cv2.getTickFrequency()
 
-    if __name__ == "__main__":
-        output_filename = 'output_video2.mp4'
-        duration = 30  # Duration in seconds
-        record_video(output_filename, duration)
-        # output_image = r'C:\Users\gizem\Desktop\output_imagee.jpg'
-        # output_image = 'output_imagee.jpg'
-        # record_image(output_image)

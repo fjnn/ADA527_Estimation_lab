@@ -48,7 +48,7 @@ def com_from_encoders(frame, qube_object):
 
     # Print the result
     removed_offset = image_coords - [init_com_x, init_com_y]
-    print("removed coordinates:", removed_offset[0], "World coordinates:", com_encoder_camera_frame)
+    # print("removed coordinates:", removed_offset[0], "World coordinates:", com_encoder_camera_frame)
 
     # Draw points on the image (optional)
     for i, coord in enumerate(removed_offset):
@@ -90,7 +90,7 @@ rectangle_detector = RedRectangle()
 pixel_capture = PixelToWorldCoordinates(cap=cap, cwd=cwd, calib_file_name='calibration_matrix.yaml')
 qube_object = Qube()
 recorder_object = Recorder(cap, output_filename='output_video_with_encoders.mp4')
-record_duration = 5
+record_duration = 30
 
 
 # Define origin point
@@ -112,7 +112,7 @@ while True:
     detected_frame, com_coordinates_from_video, com_pixels_from_video = com_from_video_frame(undistorted_frame, rectangle_detector)
 
     # Record video and data
-    recorder_object.record_data(qube_object, com_pixels_from_encoder, com_pixels_from_video)
+    recorder_object.record_data(com_pixels_from_encoder, com_pixels_from_video)
     recorder_object.record_video(frame)
     print(recorder_object.elapsed_time)
 
@@ -135,6 +135,7 @@ while True:
 
 print("KeyboardInterrupt received. Exiting...")
 
+recorder_object.save_to_csv(csv_file_name='recoded_data.csv')
 cap.release()
 recorder_object.out.release()
 qube_object.close_all()
