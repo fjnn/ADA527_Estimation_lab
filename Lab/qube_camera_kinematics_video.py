@@ -88,12 +88,14 @@ cap = cv2.VideoCapture(1) ## Use cv2.VideoCapture(1) for real camera.
 
 rectangle_detector = RedRectangle()
 pixel_capture = PixelToWorldCoordinates(cap=cap, cwd=cwd, calib_file_name='calibration_matrix.yaml')
+qube_object = Qube()
+recorder_object = Recorder(cap, output_filename='output_video_with_encoders.mp4')
+record_duration = 5
 
 
 # Define origin point
 origin = (int(camera_matrix[0, 2])+origin_offset_x, int(camera_matrix[1, 2])+origin_offset_y)
 init_com = (int(camera_matrix[0, 2])+init_com_x, int(camera_matrix[1, 2])+init_com_y)
-qube_object = Qube()
 
 while True:
 
@@ -109,16 +111,23 @@ while True:
     com_pixels_from_encoder, com_coordinates_from_encoder = com_from_encoders(undistorted_frame, qube_object)
     detected_frame, com_coordinates_from_video, com_pixels_from_video = com_from_video_frame(undistorted_frame, rectangle_detector)
 
+    # Record video and data
+    recorder_object.record_data(qube_object, com_pixels_from_encoder, com_pixels_from_video)
+    recorder_object.record_video(frame)
+    print(recorder_object.elapsed_time)
+
+    if recorder_object.elapsed_time >= record_duration:
+        break
 
     # Display the frame
-    cv2.imshow('Frame', detected_frame)
+    # cv2.imshow('Frame', detected_frame)
 
     # Exit if 'q' is pressed
     key = cv2.waitKey(1) & 0xFF 
     if key == ord('q'):
         break
 
-        # Exit if 's' is pressed
+    # Exit if 's' is pressed
     elif key == ord('s'):
         init_com_x = com_pixels_from_encoder[0,0,0] - init_com[0]
         init_com_y = com_pixels_from_encoder[0,0,1] - init_com[1]
@@ -126,6 +135,8 @@ while True:
 
 print("KeyboardInterrupt received. Exiting...")
 
+cap.release()
+recorder_object.out.release()
 qube_object.close_all()
 cv2.destroyAllWindows()
 

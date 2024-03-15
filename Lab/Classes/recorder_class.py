@@ -2,52 +2,39 @@ import cv2
 
 
 class Recorder:
-    def record_data(self, qube_object, pixels_from_encoder, pixels_from_cv2):
-        encoder_angles = qube_object.read_encoders_once()
-        qube_object.kinematics(theta=encoder_angles[0], alpha=encoder_angles[1])    
 
-
-    def record_video(cap, frame, ret, output_filename, duration):
+    def __init__(self, cap, output_filename):
         # Get the default frame width and height
-        frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
         # Define the codec and create VideoWriter object
         fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
-        out = cv2.VideoWriter(output_filename, fourcc, 60.0, (frame_width, frame_height))
+        self.out = cv2.VideoWriter(output_filename, fourcc, 60.0, (self.frame_width, self.frame_height))
 
-        start_time = cv2.getTickCount()
+        self.start_time = cv2.getTickCount()
 
-        while True:
-            # Capture frame-by-frame
-            ret, frame = cap.read()
+        
+    def record_data(self, qube_object, pixels_from_encoder, pixels_from_cv2):
+        # encoder_angles = qube_object.read_encoders_once()
+        # qube_object.kinematics(theta=encoder_angles[0], alpha=encoder_angles[1])    
+        pass
 
-            # Check if the frame was successfully captured
-            if not ret:
-                print("Error: Couldn't capture frame.")
-                break
 
-            # Write the frame to the output video file
-            out.write(frame)
+    def record_video(self, frame):
+        
 
-            # Calculate the elapsed time
-            elapsed_time = (cv2.getTickCount() - start_time) / cv2.getTickFrequency()
+        # Write the frame to the output video file
+        self.out.write(frame)
 
-            # Break the loop if the duration has been reached
-            if elapsed_time >= duration:
-                break
+        # Calculate the elapsed time
+        self.elapsed_time = (cv2.getTickCount() - self.start_time) / cv2.getTickFrequency()
 
-            # Display the frame
-            cv2.imshow('Recording...', frame)
+        # Display the frame
+        cv2.imshow('Recording...', frame)
 
-            # Exit if 'q' is pressed
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
 
-        # Release everything
-        cap.release()
-        out.release()
-        cv2.destroyAllWindows()
+
 
     if __name__ == "__main__":
         output_filename = 'output_video2.mp4'
