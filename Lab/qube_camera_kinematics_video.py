@@ -12,6 +12,47 @@ from math import degrees
 from Classes import RedRectangle 
 from Classes import PixelToWorldCoordinates
 
+def com_from_video_frame(frame, rectangle_detector):
+    # Detect the red stick
+    detected_frame = rectangle_detector.detect_red_stick(frame)
+    com_pixels = rectangle_detector.get_com_pixels()
+    com_coordinates = pixel_capture.convert_pixels_to_world_coordinates(frame, com_pixels)
+    # print("CoM world coordinates:", com_coordinates)
+    face_width_in_frame = rectangle_detector.get_stick_width_in_pixels()
+    face_height_in_frame = rectangle_detector.get_stick_height_in_pixels()
+    try:
+        distance = rectangle_detector.distance_finder(face_width_in_frame=face_width_in_frame)
+    except ZeroDivisionError:
+        distance = rectangle_detector.measured_distance
+
+    print("distance:   ",distance, "     width:  ", face_width_in_frame, "     height:  ", face_height_in_frame)
+    # print(f'Distance: {distance:.2f}')
+    # print(f'Width: {face_width_in_frame:.2f}')
+    cv2.putText(frame, f'World Coords: ({com_coordinates[0]*distance:.2f}, {com_coordinates[1]*distance:.2f}, {com_coordinates[2]:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+
+    return detected_frame
+
+
+def com_from_encoders(frame, qube_object):
+    encoder_readings = qube_object.read_encoders_once()
+    com_encoder_world_frame = qube_object.kinematics(encoder_readings[0], encoder_readings[1])
+    com_encoder_camera_frame = qube_object.qube_to_camera(com_encoder_world_frame)
+    # print("com_encoder: ", com_encoder_camera_frame, "angles: ", degrees(encoder_readings[0]), degrees(encoder_readings[1]))
+
+    # Perform projection
+    image_coords, _ = cv2.projectPoints(com_encoder_camera_frame, np.eye(3), np.zeros(3), camera_matrix, dist_coeff)
+
+    # Convert floating point pixel coordinates to integers
+    image_coords = np.round(image_coords).astype(int)
+
+    # Print the result
+    removed_offset = image_coords - [init_com_x, init_com_y]
+    print("removed coordinates:", removed_offset[0], "World coordinates:", com_encoder_camera_frame)
+
+    # Draw points on the image (optional)
+    for i, coord in enumerate(removed_offset):
+        cv2.circle(frame, tuple(coord.ravel()), 5, (0, 255, 0), -1)
+
 
 cwd = os.getcwd()
 # Locate your camera_calibration.yaml file
@@ -62,41 +103,18 @@ while True:
     # Draw origin and mouse position on the frame
     cv2.circle(undistorted_frame, pixel_capture.origin, 5, (0, 0, 255), -1)
 
-# Detect the red stick
-    detected_frame = rectangle_detector.detect_red_stick(undistorted_frame)
-    com_pixels = rectangle_detector.get_com_pixels()
-    com_coordinates = pixel_capture.convert_pixels_to_world_coordinates(undistorted_frame, com_pixels)
-    # print("CoM world coordinates:", com_coordinates)
-    face_width_in_frame = rectangle_detector.get_stick_width_in_pixels()
-    face_height_in_frame = rectangle_detector.get_stick_height_in_pixels()
-    try:
-        distance = rectangle_detector.distance_finder(face_width_in_frame=face_width_in_frame)
-    except ZeroDivisionError:
-        distance = rectangle_detector.measured_distance
+    
+    detected_frame = com_from_video_frame(undistorted_frame, rectangle_detector)
+    com_from_encoders(undistorted_frame, qube_object)
 
-    print("distance:   ",distance, "     width:  ", face_width_in_frame, "     height:  ", face_height_in_frame)
-    # print(f'Distance: {distance:.2f}')
-    # print(f'Width: {face_width_in_frame:.2f}')
-    cv2.putText(undistorted_frame, f'World Coords: ({com_coordinates[0]*distance:.2f}, {com_coordinates[1]*distance:.2f}, {com_coordinates[2]:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
-    encoder_readings = qube_object.read_encoders_once()
-    com_encoder_world_frame = qube_object.kinematics(encoder_readings[0], encoder_readings[1])
-    com_encoder_camera_frame = qube_object.qube_to_camera(com_encoder_world_frame)
-    # print("com_encoder: ", com_encoder_camera_frame, "angles: ", degrees(encoder_readings[0]), degrees(encoder_readings[1]))
 
-    # Perform projection
-    image_coords, _ = cv2.projectPoints(com_encoder_camera_frame, np.eye(3), np.zeros(3), camera_matrix, dist_coeff)
 
-    # Convert floating point pixel coordinates to integers
-    image_coords = np.round(image_coords).astype(int)
 
-    # Print the result
-    removed_offset = image_coords - [init_com_x, init_com_y]
-    print("removed coordinates:", removed_offset[0], "World coordinates:", com_encoder_camera_frame)
 
-    # Draw points on the image (optional)
-    for i, coord in enumerate(removed_offset):
-        cv2.circle(undistorted_frame, tuple(coord.ravel()), 5, (0, 255, 0), -1)
+
+
+
 
     # Display the frame
     cv2.imshow('Frame', detected_frame)
@@ -116,3 +134,4 @@ print("KeyboardInterrupt received. Exiting...")
 
 qube_object.close_all()
 cv2.destroyAllWindows()
+

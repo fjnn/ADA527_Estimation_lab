@@ -103,11 +103,11 @@ class RedRectangle:
             self.middle_point = (middle_x, middle_y)
             
             # Draw origin and mouse position on the frame
-            # cv2.circle(frame, self.middle_point, 5, (255, 0, 0), 3)
-            cv2.circle(frame, box[0], 5, (255, 0, 0), 2) # bottom_left
-            cv2.circle(frame, box[1], 5, (0, 255, 0), 4) # top_left
-            cv2.circle(frame, box[2], 5, (255, 255, 0), 6) # top_right
-            cv2.circle(frame, box[3], 5, (255, 0, 255), 8) # bottom_right
+            cv2.circle(frame, self.middle_point, 5, (255, 0, 0), 3)
+            # cv2.circle(frame, box[0], 5, (255, 0, 0), 2) # bottom_left
+            # cv2.circle(frame, box[1], 5, (0, 255, 0), 4) # top_left
+            # cv2.circle(frame, box[2], 5, (255, 255, 0), 6) # top_right
+            # cv2.circle(frame, box[3], 5, (255, 0, 255), 8) # bottom_right
 
         return frame
     
