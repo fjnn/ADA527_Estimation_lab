@@ -17,7 +17,7 @@ rectangle_detector = RedRectangle()
 pixel_capture = PixelToWorldCoordinates(cap=cap, cwd=cwd, calib_file_name='calibration_matrix.yaml')
 
 while True:
-    # Capture frame from webcam
+    # Capture frame from the seected video type
     ret, frame = pixel_capture.cap.read()
 
     # Undistort the frame

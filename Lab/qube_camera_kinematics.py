@@ -37,8 +37,6 @@ cv2.circle(img, origin, 5, (0, 0, 255), -1)
 
 qube_object = Qube()
 
-key = cv2.waitKey(1) & 0xFF  # Mask with 0xFF to get the last 8 bits
-
 while True:
     encoder_readings = qube_object.read_encoders_once()
     com_encoder_world_frame = qube_object.kinematics(encoder_readings[0], encoder_readings[1])
