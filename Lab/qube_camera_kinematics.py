@@ -27,8 +27,8 @@ img_without_circles = img.copy()
 origin_offset_y = 275
 origin_offset_x = 10
 
-init_com_x = 80
-init_com_y = 160
+init_com_x = -80
+init_com_y = 0
 
 # Define origin point
 origin = (int(camera_matrix[0, 2])+origin_offset_x, int(camera_matrix[1, 2])+origin_offset_y)
@@ -44,7 +44,7 @@ while True:
     com_encoder_world_frame = qube_object.kinematics(encoder_readings[0], encoder_readings[1])
     com_encoder_camera_frame = qube_object.qube_to_camera(com_encoder_world_frame)
     # print("com_encoder: ", com_encoder_camera_frame, "angles: ", degrees(encoder_readings[0]), degrees(encoder_readings[1]))
-    # sleep(0.5)
+
     # Perform projection
     image_coords, _ = cv2.projectPoints(com_encoder_camera_frame, np.eye(3), np.zeros(3), camera_matrix, dist_coeff)
 
@@ -52,8 +52,6 @@ while True:
     image_coords = np.round(image_coords).astype(int)
 
     # Print the result
-    # print("World coordinates:", com_encoder_camera_frame)
-    # print("Image coordinates:", image_coords)
     removed_offset = image_coords - [init_com_x, init_com_y]
     print("removed coordinates:", removed_offset[0], "World coordinates:", com_encoder_camera_frame)
 
