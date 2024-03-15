@@ -252,7 +252,8 @@ class Qube:
     
     def qube_to_camera(self, ee_world_coordinates):
         '''
-        To visualize encoder measurements on the camera, use these coordinates.
+        To visualize encoder measurements on the camera, use these coordinates. Considering the lens rotation etc.
+        #TODO: Simplify later.
         '''
         ## Camera transformation
         # T_w_camera = Link(ET.tz(self.l1) * ET.Rz(np.pi))
