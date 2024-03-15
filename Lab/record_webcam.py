@@ -75,9 +75,9 @@ def record_video(output_filename, duration):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    output_filename = 'output_video3.mp4'
-    duration = 30  # Duration in seconds
-    record_video(output_filename, duration)
+    # output_filename = 'output_video3.mp4'
+    # duration = 30  # Duration in seconds
+    # record_video(output_filename, duration)
     # output_image = r'C:\Users\gizem\Desktop\output_imagee.jpg'
-    # output_image = 'output_imagee.jpg'
-    # record_image(output_image)
+    output_image = 'output_image_qube.jpg'
+    record_image(output_image)
