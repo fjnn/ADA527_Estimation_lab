@@ -20,8 +20,9 @@ dist_coeff = np.array(calibration_data['dist_coeff'])
 com_world_coord = np.array([21.8988748,  62.00489438, 87.29877163])
 
 img = cv2.imread(cwd+'output_image_qube.jpg')
-origin_offset_y = 275
-origin_offset_x = 10
+## TODO: This needs adjustments all the time... Find out why.
+origin_offset_y = 175
+origin_offset_x = 40
 
 # Define origin point
 origin = (int(camera_matrix[0, 2])+origin_offset_x, int(camera_matrix[1, 2])+origin_offset_y)
