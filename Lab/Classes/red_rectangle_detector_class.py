@@ -94,6 +94,7 @@ class RedRectangle:
 
             # Calculate the distance between the top and bottom sides
             self.measured_width_pixels = abs(min(box[:,0]) - max(box[:,0]))
+            self.measured_height_pixels = abs(min(box[:,1]) - max(box[:,1]))
             # self.measured_height_pixels = np.sqrt((top_right[0] - bottom_right[0])**2 + (top_right[1] - bottom_right[1])**2)
             # self.measured_width_pixels = np.sqrt((bottom_right[0] - bottom_left[0])**2 + (bottom_right[1] - bottom_left[1])**2)
             # Calculate the middle point of the rectangle

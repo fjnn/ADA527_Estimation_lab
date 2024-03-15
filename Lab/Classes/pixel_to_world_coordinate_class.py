@@ -51,7 +51,7 @@ class PixelToWorldCoordinates:
         
         # Rotate from camera frame to qube frame
         R_camera_q = np.matmul(base.rotx(-np.pi/2), base.roty(-np.pi/2))
-        transformed_coordinates = np.matmul(R_camera_q, np.array([pixel_position[0], pixel_position[1], 0]))
+        transformed_coordinates = np.matmul(R_camera_q, np.array([pixel_position[0], pixel_position[1], 0.4])) #TODO: Check 0.4 later
         return transformed_coordinates
     
         # Peter Corkey way:
