@@ -256,7 +256,7 @@ class Qube:
         '''
         ## Camera transformation
         # T_w_camera = Link(ET.tz(self.l1) * ET.Rz(np.pi))
-        T_w_camera = Link(ET.Ry(np.pi/2)* ET.Rx(-np.pi/2))
+        T_w_camera = Link(ET.Ry(np.pi/2) * ET.Rz(-np.pi/4) * ET.Rx(-np.pi/2)* ET.Ry(-np.pi/2))
         transformed_ee_coordinates = np.matmul(T_w_camera.A().R, ee_world_coordinates)
 
         return transformed_ee_coordinates
