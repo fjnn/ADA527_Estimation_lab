@@ -11,6 +11,7 @@ from math import degrees
 
 from Classes import RedRectangle 
 from Classes import PixelToWorldCoordinates
+from Classes import Recorder
 
 def com_from_video_frame(frame, rectangle_detector):
     # Detect the red stick
@@ -25,12 +26,12 @@ def com_from_video_frame(frame, rectangle_detector):
     except ZeroDivisionError:
         distance = rectangle_detector.measured_distance
 
-    print("distance:   ",distance, "     width:  ", face_width_in_frame, "     height:  ", face_height_in_frame)
+    # print("distance:   ",distance, "     width:  ", face_width_in_frame, "     height:  ", face_height_in_frame)
     # print(f'Distance: {distance:.2f}')
     # print(f'Width: {face_width_in_frame:.2f}')
     cv2.putText(frame, f'World Coords: ({com_coordinates[0]*distance:.2f}, {com_coordinates[1]*distance:.2f}, {com_coordinates[2]:.2f})', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
-    return detected_frame
+    return detected_frame, com_coordinates, com_pixels
 
 
 def com_from_encoders(frame, qube_object):
@@ -52,6 +53,8 @@ def com_from_encoders(frame, qube_object):
     # Draw points on the image (optional)
     for i, coord in enumerate(removed_offset):
         cv2.circle(frame, tuple(coord.ravel()), 5, (0, 255, 0), -1)
+
+    return image_coords, removed_offset
 
 
 cwd = os.getcwd()
@@ -103,17 +106,8 @@ while True:
     # Draw origin and mouse position on the frame
     cv2.circle(undistorted_frame, pixel_capture.origin, 5, (0, 0, 255), -1)
 
-    
-    detected_frame = com_from_video_frame(undistorted_frame, rectangle_detector)
-    com_from_encoders(undistorted_frame, qube_object)
-
-
-
-
-
-
-
-
+    com_pixels_from_encoder, com_coordinates_from_encoder = com_from_encoders(undistorted_frame, qube_object)
+    detected_frame, com_coordinates_from_video, com_pixels_from_video = com_from_video_frame(undistorted_frame, rectangle_detector)
 
 
     # Display the frame
@@ -126,8 +120,8 @@ while True:
 
         # Exit if 's' is pressed
     elif key == ord('s'):
-        init_com_x = image_coords[0,0,0] - init_com[0]
-        init_com_y = image_coords[0,0,1] - init_com[1]
+        init_com_x = com_pixels_from_encoder[0,0,0] - init_com[0]
+        init_com_y = com_pixels_from_encoder[0,0,1] - init_com[1]
         print("Registered:  ", init_com_x, "---", init_com_x)
 
 print("KeyboardInterrupt received. Exiting...")
