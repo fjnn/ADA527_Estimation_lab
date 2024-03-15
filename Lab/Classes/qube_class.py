@@ -14,6 +14,7 @@ import numpy as np
 from math import *
 
 from spatialmath import *
+import spatialmath.base as base
 import roboticstoolbox as rtb
 from roboticstoolbox import ET, Link
 from math import radians as d2r
@@ -121,7 +122,7 @@ class Qube:
 
 
     def read_encoders_once(self):
-        print("Started")     
+        # print("Started")     
 
         try:
         
@@ -151,7 +152,7 @@ class Qube:
             theta_rad = -2*math.pi/512/4*self.encoder_buffer[0]
             alpha_rad = (2*math.pi/512/4*self.encoder_buffer[1]) % (2 * math.pi) - math.pi
 
-            print("theta: ", degrees(theta_rad), "   alpha: ", degrees(alpha_rad))
+            # print("theta: ", degrees(theta_rad), "   alpha: ", degrees(alpha_rad))
         except Exception as e: 
             self.exception_handler()
         
@@ -197,7 +198,7 @@ class Qube:
                 theta_rad = -2*math.pi/512/4*self.encoder_buffer[0]
                 alpha_rad = (2*math.pi/512/4*self.encoder_buffer[1]) % (2 * math.pi) - math.pi
 
-                print("theta: ", degrees(theta_rad), "   alpha: ", degrees(alpha_rad))
+                # print("theta: ", degrees(theta_rad), "   alpha: ", degrees(alpha_rad))
 
             print("Shutting down...")
           
@@ -224,23 +225,36 @@ class Qube:
 
         ## Camera transformation
         T_w_camera = Link(ET.tz(l1) * ET.Rz(np.pi))
+        R_q_world = base.rotz(np.pi/2)
+
 
         ## Qube+Pendulum is like the second robot
-        theta = d2r(theta)
-        alpha = d2r(alpha)
+        theta = theta
+        alpha = alpha
         # T_w_motor = Link(ET.tz(l3) * ET.Rz(theta))
         # T_motor_rodCOM = Link(ET.Rz(0) * ET.tx(l4) * ET.ty(l5*np.sin(alpha)) * ET.tz(l3-l5*np.cos(alpha)))
         # robot = rtb.Robot([T_w_motor, T_motor_rodCOM], name="qube robot")
 
         # joint1 = rtb.RevoluteDH(d=0, a=0, alpha=0, offset=0, qlim=(-0.01, 0.01))
-        joint1 = rtb.RevoluteDH(d=l3, alpha=np.pi/2, a=0, offset=0, qlim=(-0.01, 0.01))
-        joint2 = rtb.RevoluteDH(d=l4, alpha=np.pi/2, a=0, offset=0, qlim=(-0.01, 0.01))
+        joint1 = rtb.RevoluteDH(d=l3, alpha=np.pi/2, a=0, offset=np.pi, qlim=(-np.pi, np.pi))
+        joint2 = rtb.RevoluteDH(d=l4, alpha=np.pi/2, a=0, offset=-np.pi, qlim=(-np.pi, np.pi))
         ee = rtb.RevoluteDH(d=l5, a=0, alpha=0, offset=0, qlim=(-0.01, 0.01))
         qube_pendulum_robot = rtb.DHRobot([joint1, joint2, ee], name="Qube+pendulum")
 
         q = np.array([theta, alpha, 0])
-        print(qube_pendulum_robot.fkine(q))
+        ee_position = qube_pendulum_robot.fkine(q).t
+        # print(qube_pendulum_robot.fkine(q).A())
 
-        return ee
+        R_q_world = base.rotz(np.pi/2)
+        transformed_ee_coordinates = np.matmul(R_q_world, np.array([ee_position[0], ee_position[1], ee_position[2]]))
+        transformed_ee_coordinates = np.matmul(T_w_camera.A().R, transformed_ee_coordinates)
 
-        # qube_pendulum_robot.teach(q)
+        return transformed_ee_coordinates
+
+        qube_pendulum_robot.teach(q)
+    
+    def corrector(self, ):
+        '''
+        For some reason the coordinates still don't match with kinematics and camera. Temporary solution is this.
+        '''
+        pass
