@@ -1,36 +1,68 @@
+# https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
+
+import cv2
 import numpy as np
-import sympy as sym
-from spatialmath import *
-import roboticstoolbox as rtb
-from roboticstoolbox import ET, Link
-from math import radians as d2r
+import yaml
+import os
+import spatialmath.base as base
+from Classes import Qube
+from time import sleep
+from math import degrees
 
-# Define the transformations for qube and camera
 
-l1 = 350 # camera-qube distance (x-axis)
-l2 = 160 # camera height (z-axis)
-l3 = 127 # motor height (z-axis)
-l4 = 90 # pendulum offset (x-axis)
-l5 = 65 # half of rod lenght (-z-axis(!))
+# Locate your camera_calibration.yaml file
+cwd = os.getcwd()+'\\Lab\\calibration\\'
 
-## Camera transformation
-T_w_camera = Link(ET.tz(l1) * ET.Rz(np.pi))
+with open(os.path.join(cwd, 'calibration_matrix.yaml'), 'r') as stream:
+    calibration_data = yaml.safe_load(stream)
 
-## Qube+Pendulum is like the second robot
-theta = d2r(0)
-alpha = d2r(0)
-# T_w_motor = Link(ET.tz(l3) * ET.Rz(theta))
-# T_motor_rodCOM = Link(ET.Rz(0) * ET.tx(l4) * ET.ty(l5*np.sin(alpha)) * ET.tz(l3-l5*np.cos(alpha)))
-# robot = rtb.Robot([T_w_motor, T_motor_rodCOM], name="qube robot")
+# print(calibration_data)
+camera_matrix = np.array(calibration_data['camera_matrix'])
+dist_coeff = np.array(calibration_data['dist_coeff'])
 
-# joint1 = rtb.RevoluteDH(d=0, a=0, alpha=0, offset=0, qlim=(-0.01, 0.01))
-joint1 = rtb.RevoluteDH(d=l3, alpha=np.pi/2, a=0, offset=0, qlim=(-0.01, 0.01))
-joint2 = rtb.RevoluteDH(d=l4, alpha=np.pi/2, a=0, offset=0, qlim=(-0.01, 0.01))
-ee = rtb.RevoluteDH(d=l5, a=0, alpha=0, offset=0, qlim=(-0.01, 0.01))
-qube_pendulum_robot = rtb.DHRobot([joint1, joint2, ee], name="Qube+pendulum")
+com_world_coord = np.array([21.8988748,  62.00489438, 87.29877163])
 
-q = np.array([theta, alpha, 0])
-print(qube_pendulum_robot.fkine(q))
+img = cv2.imread(cwd+'output_image_qube.jpg')
+## TODO: This needs adjustments all the time... Find out why.
+origin_offset_y = 175
+origin_offset_x = 40
 
-# qube_pendulum_robot.teach(q)
+# Define origin point
+origin = (int(camera_matrix[0, 2])+origin_offset_x, int(camera_matrix[1, 2])+origin_offset_y)
 
+qube_object = Qube()
+
+key = cv2.waitKey(1) & 0xFF  # Mask with 0xFF to get the last 8 bits
+
+while True:
+    encoder_readings = qube_object.read_encoders_once()
+    com_encoder = qube_object.kinematics(encoder_readings[0], encoder_readings[1])
+    com_encoder = qube_object.qube_to_camera(com_encoder)
+    print("com_encoder: ", com_encoder, "angles: ", degrees(encoder_readings[0]), degrees(encoder_readings[1]))
+    # sleep(0.5)
+    # Perform projection
+    image_coords, _ = cv2.projectPoints(com_world_coord, np.eye(3), np.zeros(3), camera_matrix, dist_coeff)
+
+    # Convert floating point pixel coordinates to integers
+    image_coords = np.round(image_coords).astype(int)
+
+    # Print the result
+    print("World coordinates:", com_world_coord)
+    print("Image coordinates:", image_coords)
+    removed_offset = image_coords - [origin_offset_x, origin_offset_y]
+
+    # Draw points on the image (optional)
+    for i, coord in enumerate(removed_offset):
+        cv2.circle(img, tuple(coord.ravel()), 5, (0, 255, 0), -1)
+
+    # Show the image with drawn points (optional)
+    cv2.imshow('Image', img)
+
+    # Exit if 'q' is pressed
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+print("KeyboardInterrupt received. Exiting...")
+
+qube_object.close_all()
+cv2.destroyAllWindows()
