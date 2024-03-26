@@ -38,8 +38,22 @@ And then, use them in the Kalman filter.
 
 Finally, we compare the (x, y) coordinated found by the KF (this is our observation vector (aka **y** vector) with the encoder readings to evaluate the performance of our KF.
 
+### Part 1 Using recorded data
+
+The purpose of this step is to setup your Kalman filter and ensure that it is working on a system that you know what the output should be (somehow). In part-2, you will record your own data and use the KF that you configured in part-1.
+
+Here we you have the data under **recorded_data_lab ** folder. There is one mp4 and one csv file. The csv file contains the pixel positions from both the system model and the image processing.
+
 1. qube_camera_kinematics.py
    This is for
+
+
+
+### Part 2 Record your data and compare
+
+So, the given data was from a simple and slow motion. Now, you are supposed to record it on your own.
+
+1. **qube_camera_kinematics_video.py ** is the script that you will use for recording. It as you run it, it will start recording one video (mp4) and one CSV file that has 3 columns: time, pixel coordinates from image processing, pixel coordinates from system model.
 
 ## Files
 
@@ -50,5 +64,7 @@ record_webcam.py: Record a video via camera
 ## TODO:
 
 Balance_pendulum.py and camera record in one file and register CoM pose and encoder readings at the same time. DONE
+
+I forgot recording encoder values...
 
 Kalman filter implementation.

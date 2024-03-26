@@ -22,11 +22,12 @@ class Recorder:
         
 
         
-    def record_data(self, pixels_from_encoder, pixels_from_cv2):
+    def record_data(self, pixels_from_encoder, pixels_from_cv2, encoder_readings):
         self.get_elapsed_time()
         self.df.loc[len(self.df)] = {'Time': self.elapsed_time,
                                       'pixels_from_encoder': pixels_from_encoder,
-                                      'pixels_from_cv2': pixels_from_cv2}
+                                      'pixels_from_cv2': pixels_from_cv2,
+                                      'encoder_readings': encoder_readings}
        
 
 

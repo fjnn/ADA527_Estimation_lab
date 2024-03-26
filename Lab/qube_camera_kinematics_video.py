@@ -35,7 +35,7 @@ def com_from_video_frame(frame, rectangle_detector):
 
 
 def com_from_encoders(frame, qube_object):
-    encoder_readings = qube_object.read_encoders_once()
+    encoder_readings = qube_object.read_encoders_once() ## TODO: return raw encoder readings too
     com_encoder_world_frame = qube_object.kinematics(encoder_readings[0], encoder_readings[1])
     com_encoder_camera_frame = qube_object.qube_to_camera(com_encoder_world_frame)
     # print("com_encoder: ", com_encoder_camera_frame, "angles: ", degrees(encoder_readings[0]), degrees(encoder_readings[1]))
@@ -54,7 +54,7 @@ def com_from_encoders(frame, qube_object):
     for i, coord in enumerate(removed_offset):
         cv2.circle(frame, tuple(coord.ravel()), 5, (0, 255, 0), -1)
 
-    return image_coords, removed_offset
+    return image_coords, removed_offset, encoder_readings
 
 
 cwd = os.getcwd()
@@ -108,7 +108,7 @@ while True:
     # Draw origin and mouse position on the frame
     cv2.circle(undistorted_frame, pixel_capture.origin, 5, (0, 0, 255), -1)
 
-    com_pixels_from_encoder, com_coordinates_from_encoder = com_from_encoders(undistorted_frame, qube_object)
+    com_pixels_from_encoder, com_coordinates_from_encoder, encoder_readings = com_from_encoders(undistorted_frame, qube_object)
     detected_frame, com_coordinates_from_video, com_pixels_from_video = com_from_video_frame(undistorted_frame, rectangle_detector)
 
     # Record video and data
