@@ -23,7 +23,7 @@ def main():
     # Initialize Kalman filter
     kf = KalmanFilter(F=A, B=B, H=C, Q=Q, R=R, Z=y0, X=x0, P=P)
 
-    # Load data (replace this with your data loading code)
+    # Load data (replace this with your data loading code for part-2)
     cwd = os.getcwd()+'\\Lab\\recorded_data_lab\\'
     df = pd.read_csv(os.path.join(cwd, 'recorded_data.csv'))
     pixels_from_encoder = Recorder.parse_nested_array(df['pixels_from_encoder'])
@@ -43,7 +43,7 @@ def main():
         
         # Save into df
         df_estimated_positions.loc[i] = {'Time': time_list[i],
-                                      'estimated_positions': kf.X}
+                                      'estimated_positions': kf.X.astype(int)}
 
     # Print or use estimated_positions as required
     # print("Estimated Pixel Positions:", estimated_positions)
