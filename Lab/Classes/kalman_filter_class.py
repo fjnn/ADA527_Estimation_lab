@@ -40,7 +40,7 @@ class KalmanFilter:
         self.H = H
         self.R = R
 
-    def predict(self):
+    def predict(self, X):
         """
         Predict the future state
         Args:
@@ -52,7 +52,7 @@ class KalmanFilter:
             updated self.X
         """
         # Project the state ahead
-        self.X = self.F @ self.X + self.B @ self.M
+        self.X = self.F @ X + self.B @ self.M
         self.P = self.F @ self.P @ self.F.T + self.Q
 
         return self.X
@@ -68,7 +68,7 @@ class KalmanFilter:
             updated X
         """
         K = self.P @ self.H.T @ inv(self.H @ self.P @ self.H.T + self.R)
-        self.X += K @ (Z - self.H @ self.X)
+        self.X = K @ (Z - self.H @ self.X) + self.X
         self.P = self.P - K @ self.H @ self.P
 
         return self.X

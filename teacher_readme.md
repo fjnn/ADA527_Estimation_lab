@@ -67,4 +67,6 @@ Balance_pendulum.py and camera record in one file and register CoM pose and enco
 
 I forgot recording encoder values...
 
+TODO: register torque values?
+
 Kalman filter implementation.

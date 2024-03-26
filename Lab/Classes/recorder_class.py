@@ -2,6 +2,7 @@ import cv2
 import pandas as pd
 import time
 from datetime import datetime
+import numpy as np
 
 
 class Recorder:
@@ -50,3 +51,31 @@ class Recorder:
         # Calculate the elapsed time
         self.elapsed_time = (cv2.getTickCount() - self.start_time) / cv2.getTickFrequency()
 
+    @classmethod
+    def parse_nested_array(cls, nested_arrays_list):
+        parsed_arrays = []
+        if (nested_arrays_list[0][0] == '['):
+            for nested_array_str in nested_arrays_list:
+                # Remove the brackets and split the string by spaces
+                numbers = nested_array_str.strip('[]').split()
+
+                # Convert strings to integers
+                numbers = [int(num) for num in numbers]
+
+                # Convert the list to a numpy array
+                numpy_array = np.array(numbers)
+
+                parsed_arrays.append(numpy_array)
+        
+        elif (nested_arrays_list[0][0] == '('):
+            for nested_array_str in nested_arrays_list:
+                numbers = np.array([int(x) for x in nested_array_str.strip('()').split(',')])
+                parsed_arrays.append(numbers)
+
+
+        else:
+            print("None")
+            print(type(nested_arrays_list[0][0]))
+            exit()
+        
+        return parsed_arrays
