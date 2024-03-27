@@ -38,7 +38,7 @@ while i<len(time_list):
     cv2.circle(undistorted_frame, pixel_capture.origin, 5, (0, 0, 255), -1)
     cv2.circle(undistorted_frame, pixels_from_cv2[i], 5, (0, 255, 0), -1)
     cv2.circle(undistorted_frame, pixels_from_encoder[i]-[-80, 0], 5, (255, 0, 0), -1)
-    cv2.circle(undistorted_frame, estimated_positions[i], 5, (255, 255, 0), -1)
+    cv2.circle(undistorted_frame, estimated_positions[i][:2], 5, (255, 255, 0), -1)
 
     cv2.putText(undistorted_frame, 'Origin', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
     cv2.putText(undistorted_frame, 'Camera', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
