@@ -18,6 +18,14 @@ For that, we need to express things in this format.
 
 This lab consists of 2 parts. In the first part, you will be using a recorded data to complete the tasks. In the second part, you will connect your PC to Qube, record your own data and apply what you did in the first part on your data. Although, we will see how much time we will have for the next part :) 
 
+## Important!
+
+Please do not use HVL Onedrive as your project location in this lab. Choose a path (preferably short) and contains to space character in the path.
+
+## Part - 1: Use recorded data
+
+Here you have the recorded data under **recorded_data_lab** folder. There is one mp4 and one CSV file. The csv file contains the pixel positions from both the system model and the image processing and the mp4 file is the raw video while the CSV data was recorded.
+
 ## Deciding the state and observation matrices
 
 As you know, **state matrix** is a matrix form of your **system model**. The system model is a mathematical expression that relates your system states to an output entity. The system states are alpha, theta, and their derivatives and the output is the pose of the center of rod in this setup. You can use various methods to *generate* such a mathematical expression.
@@ -85,12 +93,10 @@ Since we decided to observe pixel positions, the procedure will be like this:
    where 150 is just a place holder. You should calculate the middle point of the rectangle using **x,y,w** and **h**.
    
    You can test if your calculations are right by running **pendulum_position_via_camera.py** script.
-   
-   #### Implement the Kalman filter
-   
-   Since you have both calculated and observed pixel positions, you can put everything into the matrix form. You are supposed to do some modifications in the script called **KF-qube-using-pixels.py** between lines 12 and 21. Currently, the script is not working but as you write down correct dimensions and values into matrices, it will work.
-   
-   
+
+#### Implement the Kalman filter
+
+   Since you have both calculated and observed pixel positions, you can put everything into the matrix form. You are supposed to do some modifications in the script called **KF-qube-using-pixels.py** between lines 12 and 21. Currently, the script is not working but as you write down correct dimensions and values into matrices, it will work. In the end, it will create a file called **estimated_data.csv** under **recorded_data_lab** folder.
 
 5. Realize that we simplified the system model from pendulum angles to pixel tracking:
    
@@ -98,7 +104,7 @@ Since we decided to observe pixel positions, the procedure will be like this:
    
    Find the elements of matrix A:
    
-   (Hint: remember the formula $x_{k+1} = x_k + \Delta t \cdot \dot{x_k}$ )
+   *(Hint: remember the formula $x_{k+1} = x_k + \Delta t \cdot \dot{x_k}$ )*
 
 6. Therefore, our observation can be represented like this:
    
@@ -106,75 +112,44 @@ Since we decided to observe pixel positions, the procedure will be like this:
    
    Find the elements of matrix C:
    
-   (Hint: not all states are observable.)
+   *(Hint: not all states are observable.)*
 
 7. What were Q, R and P matrices? Think about what they represent and decide their dimensions. np.eye(10) is wrong but you should use another value than 10.
    
-   (Hint: you may want to check other Kalman filter exercises we did in the class.)
+   *(Hint: you may want to check other Kalman filter exercises we did in the class.)*
 
-# Estimation Lab
+8. You are done! If you don't have any more errors in the script, you can visualize the estimated pixel points by running **visualize_estimated_positions.py**. 
+   
+   Here you will see that my system model was very poor, like really really poor... You may want to improve it later, maybe :)
+   
+   ![](C:\Users\gizem\AppData\Roaming\marktext\images\2024-03-27-17-49-27-image.png)
 
-
-
-## Important!
-
-Please do not use HVL Onedrive as your project location in this lab. Choose a path (preferably short) and contains to space character in the path.
-
-## Camera calibration
-
-Files are under /Lab/calibration/ folder.
-
-1. Place things correctly on the “workspace board”:
-   Make sure the camera and Qube placed correctly: **manual_calib.py**
-2. Generate calibration images:
-   Take some checkerboard pictures. The script is designed for 7x9 checkerboard with 20 mm squares. Try to take around 10 pictures with different angles and distances: **checkerboard_take_picture.py**
-3. Generate calibration YAML file:
-   Locate those picture and decide a location for a YAML file that is going to hold the calibration parameters. The locations might be needed to modify in the code. When you do the necessary changes, run: **calibration_camera_generator.py**
-4. Test if your coordinates are translated correctly:
-   To make sure that you did all the calibration steps correctly, you should see (0,0) coordinates on the left top corner when you move your mouse on the Qube origin in this script: **pixel_to_world_coordinates.py** The red dot visualize the Qube origin.
-
-## Actual robotic part of the lab starts here
-
-Now we have the world and camera coordinates into the pocket, we can proceed with the robotics calculations. The aim is to estimate x and y coordinates of the middle point (I referred as center of mass in the code (CoM)).
-
-### The point is
-
-We calculate (x, y) coordinates of the CoM of the pendulum using two different methods.
-
-1. system model
-2. image processing
-
-And then, use them in the Kalman filter.
-
-Finally, we compare the (x, y) coordinated found by the KF (this is our observation vector (aka **y** vector) with the encoder readings to evaluate the performance of our KF.
-
-### Part 1 Using recorded data
+## Part - 2: Record your own data and compare
 
 The purpose of this step is to setup your Kalman filter and ensure that it is working on a system that you know what the output should be (somehow). In part-2, you will record your own data and use the KF that you configured in part-1.
 
-Here we you have the data under **recorded_data_lab ** folder. There is one mp4 and one csv file. The csv file contains the pixel positions from both the system model and the image processing.
+### Calibration
 
-1. qube_camera_kinematics.py
-   This is for
+1. Make sure that the placements of the Qube and the camera is correct. For that, run  **calibration>manual_calibration.py** and make sure the qube is properly in the red rectangle. Move the camera properly if needed.
 
-### Part 2 Record your data and compare
+2. You can skip this step if you are using the Huddly camera in the lab but if you are using another camera, you have to calibrate the camera, as well. For that, 
+   
+   1. Have a checkerboard with 20x20 mm squares and total 7x9 squares.
+   
+   2. Run **calibration>checkerboard_take_picture.py** and take at least 10 pictures.
+   
+   3. Run **calibration>calibration_yaml_generator.py** and you will have a calibration_matrix.yaml file. Now you are done with camera calibration.
 
-So, the given data was from a simple and slow motion. Now, you are supposed to record it on your own.
+3. Time to record data. If you don't want to lose what is already recorded, you must either change the name of the already recorded data, or the names of the recordings in the code. Currently, the recorded video will be named as "output_video_with_encoders.mp4" and the CSV file will be "recorded_data.csv".
+   
+   For recording, you will use **qube_camera_kinematics_video.py**. (Sorry, this code is a mass, forgot to clean.)
+   
+   As you run this script, the recording will automatically start and will record for 30 seconds. Do some motions, NOW!
 
-1. **qube_camera_kinematics_video.py ** is the script that you will use for recording. It as you run it, it will start recording one video (mp4) and one CSV file that has 3 columns: time, pixel coordinates from image processing, pixel coordinates from system model.
-
-## Files
-
-live_camera_red_rect.py: Detects pendulum as a red rectangle.
-
-record_webcam.py: Record a video via camera
-
-## TODO:
-
-Balance_pendulum.py and camera record in one file and register CoM pose and encoder readings at the same time. DONE
-
-I forgot recording encoder values...
-
-TODO: register torque values?
-
-Kalman filter implementation.
+4. You are done with the recording. You can now test your KF implementation on your data:
+   
+   1. If you changed the recoding names, modify the following scripts accordingly.
+   
+   2. Run **KF-qube-using-pixels.py** to generate estimated pixel positions.
+   
+   3. Run **visualize_estimated_positions.py** to visualize them.
