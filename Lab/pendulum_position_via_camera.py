@@ -9,8 +9,8 @@ from Classes import PixelToWorldCoordinates
 
 cwd = os.getcwd()
 
-video_path = cwd+'\\Lab\\recorded_data\\'
-input_video_path = video_path+'output_video3.mp4'
+video_path = cwd+'\\Lab\\recorded_data_temp\\'
+input_video_path = video_path+'output_video2.mp4'
 cap = cv2.VideoCapture(input_video_path) ## Use cv2.VideoCapture(1) for real camera.
 
 rectangle_detector = RedRectangle()

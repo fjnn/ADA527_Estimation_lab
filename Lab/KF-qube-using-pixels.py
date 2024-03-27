@@ -16,8 +16,8 @@ def main():
     C = np.array([[1, 0], [0, 1]])
     x0 = np.array((2, 1), np.float32) # Initial state estimate
     y0 = np.zeros((2, 1), np.float32)
-    Q = np.eye(2) * 0.01  # Process noise covariance
-    R = np.eye(2) * 1  # Measurement noise covariance
+    Q = np.eye(2) * 0.1  # Process noise covariance
+    R = np.eye(2) * 0.01  # Measurement noise covariance
     P = np.eye(2)  # Initial state covariance
 
     # Initialize Kalman filter
@@ -48,7 +48,8 @@ def main():
     # Print or use estimated_positions as required
     # print("Estimated Pixel Positions:", estimated_positions)
     
-    df_estimated_positions.to_csv('estimated_data.csv', index=False)
+    df_estimated_positions.to_csv(os.path.join(cwd, 'estimated_data.csv'), index=False)
+    print("done")
         
 if __name__ == "__main__":
     main()
