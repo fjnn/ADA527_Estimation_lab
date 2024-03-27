@@ -47,8 +47,6 @@ Here we you have the data under **recorded_data_lab ** folder. There is one mp4 
 1. qube_camera_kinematics.py
    This is for
 
-
-
 ### Part 2 Record your data and compare
 
 So, the given data was from a simple and slow motion. Now, you are supposed to record it on your own.
@@ -68,5 +66,7 @@ Balance_pendulum.py and camera record in one file and register CoM pose and enco
 I forgot recording encoder values...
 
 TODO: register torque values?
+
+TODO: for qube_camera_kinematics.
 
 Kalman filter implementation.
