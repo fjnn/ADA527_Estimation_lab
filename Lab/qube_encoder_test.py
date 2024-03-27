@@ -26,12 +26,3 @@ except KeyboardInterrupt:
 
 
 
-
-# for i in range(100):
-#     encoder_readings = qube_object.read_encoders_once()
-#     qube_object.kinematics(encoder_readings[0], encoder_readings[1])
-#     sleep(0.1)
-
-
-
-

@@ -251,6 +251,7 @@ class Qube:
         ee_coordinates = np.matmul(R_q_world, np.array([ee_position[0], ee_position[1], ee_position[2]]))
 
         return ee_coordinates
+    
 
         qube_pendulum_robot.teach(q)
     

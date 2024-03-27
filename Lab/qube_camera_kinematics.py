@@ -27,6 +27,7 @@ img_without_circles = img.copy()
 origin_offset_y = 275
 origin_offset_x = 10
 
+# There is some sort of misalignment
 init_com_x = -80
 init_com_y = 0
 
@@ -35,10 +36,14 @@ origin = (int(camera_matrix[0, 2])+origin_offset_x, int(camera_matrix[1, 2])+ori
 init_com = (int(camera_matrix[0, 2])+init_com_x, int(camera_matrix[1, 2])+init_com_y)
 cv2.circle(img, origin, 5, (0, 0, 255), -1)
 
-qube_object = Qube()
+qube_object = Qube(qube_connected=False) # If you are connected to Qube, make this true:
 
 while True:
-    encoder_readings = qube_object.read_encoders_once()
+    # If you are not connected to Qube, uncomment this:
+    encoder_readings = np.array([0.0, np.pi])
+
+    # If you are connected to Qube, uncomment this:
+    # encoder_readings = qube_object.read_encoders_once()
     com_encoder_world_frame = qube_object.kinematics(encoder_readings[0], encoder_readings[1])
     com_encoder_camera_frame = qube_object.qube_to_camera(com_encoder_world_frame)
     # print("com_encoder: ", com_encoder_camera_frame, "angles: ", degrees(encoder_readings[0]), degrees(encoder_readings[1]))
