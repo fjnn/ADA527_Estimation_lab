@@ -11,14 +11,14 @@ from Classes import Recorder
 def main():
     # Define Kalman filter parameters
     dt = 0.1  # Time step
-    A = np.array([[1, 0, dt, 0], [0, 1, 0 ,dt], [0, 0, 1, 0], [0, 0, 0, 1]])
-    B = np.array([[0, 0, 0, 0]]).T
-    C = np.array([[1, 0, 0, 0], [0, 1, 0, 0]])
-    x0 = np.zeros((4, 1), np.float32) # Initial state estimate
-    y0 = np.zeros((2, 1), np.float32)
-    Q = np.eye(4) * 0.1  # Process noise covariance
-    R = np.eye(2) * 0.01  # Measurement noise covariance
-    P = np.eye(4)  # Initial state covariance
+    A = np.eye(10) # System matrix
+    B =  np.eye(10) # Input vector
+    C =  np.eye(10) # Observation matrix
+    x0 = np.zeros((10, 1), np.float32) # Initial state estimate
+    y0 = np.zeros((10, 1), np.float32)
+    Q =  np.eye(10) * 0.1  # Process noise covariance
+    R =  np.eye(10) * 0.01  # Measurement noise covariance
+    P =  np.eye(10)  # Initial state covariance
 
     # Initialize Kalman filter
     kf = KalmanFilter(F=A, B=B, H=C, Q=Q, R=R, Z=y0, X=x0, P=P)
@@ -37,8 +37,6 @@ def main():
     df_estimated_positions = pd.DataFrame(columns=['Time', 'estimated_positions'])
     for i in range(1, len(time_list)):
         # Predict
-        # print(i)
-        # print(pixels_from_encoder[0])
         kf.predict(pixels_from_encoder[i-1])
         
         # Update with measurement

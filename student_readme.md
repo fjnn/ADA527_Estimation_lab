@@ -16,6 +16,8 @@ For that, we need to express things in this format.
 
 <img src="file:///C:/Users/gizem/AppData/Roaming/marktext/images/2024-03-27-12-33-35-image.png" title="" alt="" data-align="center">
 
+This lab consists of 2 parts. In the first part, you will be using a recorded data to complete the tasks. In the second part, you will connect your PC to Qube, record your own data and apply what you did in the first part on your data. Although, we will see how much time we will have for the next part :) 
+
 ## Deciding the state and observation matrices
 
 As you know, **state matrix** is a matrix form of your **system model**. The system model is a mathematical expression that relates your system states to an output entity. The system states are alpha, theta, and their derivatives and the output is the pose of the center of rod in this setup. You can use various methods to *generate* such a mathematical expression.
@@ -50,7 +52,7 @@ At this point, you should take a decision. Are you planning to **observe the the
 
 Since we decided to observe pixel positions, the procedure will be like this:
 
-#### Obtain pixel positions via system model
+#### Obtain pixel positions using kinematics
 
 1. Choose the relevant frame of references for the camera, Qube and the world. For simplicity, we can choose the world frame and the Qube frame coincided like this:
    
@@ -64,23 +66,51 @@ Since we decided to observe pixel positions, the procedure will be like this:
    
     $^C\xi_{rod} = ^WR_C \cdot ^W\xi_{rod}$. This one was tricky since the lens rotation in the camera was a bit weird. That's why it is given for you in **Classes>qube_class.py>qube_to_camera (func)**.
 
-3. Transform $^C\xi_{rod}$ into pixel frame. To transform pixels into world coordinates, or vice versa, you would need a camera calibration matrix. We already provide the calibration matrix for you, that's why we don't get into details. Let's call these pixel points as $\begin{bmatrix} X_{enc} \\\ Y_{enc} \end{bmatrix}$ indicated that they were obtained from encoder readings (and thus via kinematics). Make sure that everything is fine by running **qube_camera_kinematics.py** and see a green dot in the center of the rod:
+3. Transform $^C\xi_{rod}$ into pixel frame. To transform pixels into world coordinates, or vice versa, you would need a camera calibration matrix. We already provide the calibration matrix for you, that's why we don't get into details. Let's call these pixel points as $\begin{bmatrix} x_{enc} \\\ y_{enc} \end{bmatrix}$ indicated that they were obtained from encoder readings (and thus via kinematics). Make sure that everything is fine by running **qube_camera_kinematics.py** and see a green dot in the center of the rod:
    
    <img title="" src="file:///C:/Users/gizem/AppData/Roaming/marktext/images/2024-03-27-16-15-41-image.png" alt="" width="385" data-align="center">
    
    *Note: You may check the relevant code for calibration under calibration folder.*
+   
+   #### Obtain pixel positions using kinematics
 
-4. Now you need to obtain the pixel positions via camera. Let's call these pixel points as $\begin{bmatrix} X_{cv2} \\ Y_{cv2} \end{bmatrix}$ indicated that they were obtained via image processing using CV2 library.
+4. Now you need to obtain the pixel positions via camera. Let's call these pixel points as $\begin{bmatrix} x_{cv2} \\ y_{cv2} \end{bmatrix}$ indicated that they were obtained via image processing *using CV2 library.* This is pure image processing and outside the scope of this course. Therefore, we provide you the code that automatically detects a red rectangle (this is how the Qube's rod looks like in 2D). However, for the completion, we would like you to calculate the middle point of the rectangle using some simple math :) 
+   
+   Write down the proper in **Classes>red_rectangle_class.py** in these lines:
+   
+               middle_x = 150
+   
+               middle_y = 150
+   
+   where 150 is just a place holder. You should calculate the middle point of the rectangle using **x,y,w** and **h**.
+   
+   You can test if your calculations are right by running **pendulum_position_via_camera.py** script.
+   
+   #### Implement the Kalman filter
+   
+   Since you have both calculated and observed pixel positions, you can put everything into the matrix form. You are supposed to do some modifications in the script called **KF-qube-using-pixels.py** between lines 12 and 21. Currently, the script is not working but as you write down correct dimensions and values into matrices, it will work.
+   
+   
 
-5. Put everything into the matrix form:
+5. Realize that we simplified the system model from pendulum angles to pixel tracking:
    
-   A:
+   ![](C:\Users\gizem\AppData\Roaming\marktext\images\2024-03-27-17-24-44-image.png)
    
-   (hint: remember the formula x_{k+1} = x_k + \Delta t \cdot v_k)
+   Find the elements of matrix A:
    
-   B:
+   (Hint: remember the formula $x_{k+1} = x_k + \Delta t \cdot \dot{x_k}$ )
+
+6. Therefore, our observation can be represented like this:
    
-   C:
+   ![](C:\Users\gizem\AppData\Roaming\marktext\images\2024-03-27-17-26-32-image.png)
+   
+   Find the elements of matrix C:
+   
+   (Hint: not all states are observable.)
+
+7. What were Q, R and P matrices? Think about what they represent and decide their dimensions. np.eye(10) is wrong but you should use another value than 10.
+   
+   (Hint: you may want to check other Kalman filter exercises we did in the class.)
 
 # Estimation Lab
 
