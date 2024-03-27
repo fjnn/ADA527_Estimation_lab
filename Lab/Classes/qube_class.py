@@ -22,7 +22,7 @@ from math import radians as d2r
 
 class Qube:
 
-    def __init__(self):
+    def __init__(self, qube_connected=True):
 
         # Distances and lengths
         # Define the transformations for qube and camera
@@ -70,35 +70,36 @@ class Qube:
         # Moment of inertia of pendulum about center of mass (kg-m^2)
         self.Jp_cm = self.mp*(self.Lp**2)/12 # used to calculate pendulum energy in swing-up control
 
-        # Open the Qube 3
-        self.card = HIL("qube_servo3_usb", "0")
-        self.task = None
+        if qube_connected:
+            # Open the Qube 3
+            self.card = HIL("qube_servo3_usb", "0")
+            self.task = None
 
-        self.encoder_channels_read = np.array([0, 1], dtype=np.uint32)
-        self.encoder_buffer = np.zeros(len(self.encoder_channels_read), dtype=np.int32)
-        self.encoder_buffer = np.zeros(len(self.encoder_channels_read), dtype=np.int32)
+            self.encoder_channels_read = np.array([0, 1], dtype=np.uint32)
+            self.encoder_buffer = np.zeros(len(self.encoder_channels_read), dtype=np.int32)
+            self.encoder_buffer = np.zeros(len(self.encoder_channels_read), dtype=np.int32)
 
-        # For LED:
-        self.other_channels_read = np.array([14000, 14001], dtype=np.uint32)
-        self.other_channels_write = np.array([11000, 11001, 11002], dtype=np.uint32)
-        self.other_buffer = np.zeros(len(self.other_channels_read), dtype=np.float64)
+            # For LED:
+            self.other_channels_read = np.array([14000, 14001], dtype=np.uint32)
+            self.other_channels_write = np.array([11000, 11001, 11002], dtype=np.uint32)
+            self.other_buffer = np.zeros(len(self.other_channels_read), dtype=np.float64)
 
-        #If you want to change any board-specific options, it can be done here
-        #card.set_card_specific_options("deadband_compensation=0.65, pwm_en=0, enc0_velocity=3q.0, enc1_velocity=3.0", 4)
-        self.card.set_card_specific_options("deadband_compensation=0.65", MAX_STRING_LENGTH) 
+            #If you want to change any board-specific options, it can be done here
+            #card.set_card_specific_options("deadband_compensation=0.65, pwm_en=0, enc0_velocity=3q.0, enc1_velocity=3.0", 4)
+            self.card.set_card_specific_options("deadband_compensation=0.65", MAX_STRING_LENGTH) 
 
-        try:
-            # reset both encoders to values of 0
-            self.card.set_encoder_counts(self.encoder_channels_read, len(self.encoder_channels_read), np.array([0, 0], dtype=np.int32))
-            
-            # set LED's [Red, Green, Blue]
-            self.card.write_other(self.other_channels_write, len(self.other_channels_write), np.array([1,1,0], dtype=np.float64))  
+            try:
+                # reset both encoders to values of 0
+                self.card.set_encoder_counts(self.encoder_channels_read, len(self.encoder_channels_read), np.array([0, 0], dtype=np.int32))
+                
+                # set LED's [Red, Green, Blue]
+                self.card.write_other(self.other_channels_write, len(self.other_channels_write), np.array([1,1,0], dtype=np.float64))  
 
-        except Exception as e: 
-            self.exception_handler()
+            except Exception as e: 
+                self.exception_handler()
 
-            
-        print("initialized")
+                
+            print("initialized")
 
     
     def exception_handler(self):
@@ -224,7 +225,7 @@ class Qube:
             self.exception_handler()
 
     
-    def kinematics(self, theta=0, alpha=0):
+    def kinematics(self, theta=0, alpha=0, plotted=False):
 
         ## Qube+Pendulum is like the second robot
         theta = theta
@@ -242,6 +243,9 @@ class Qube:
         q = np.array([theta, alpha, 0])
         ee_position = qube_pendulum_robot.fkine(q).t
         # print(qube_pendulum_robot.fkine(q).A())
+        print("here")
+        if plotted:
+            qube_pendulum_robot.teach(q)
 
         R_q_world = base.rotz(np.pi/2)
         ee_coordinates = np.matmul(R_q_world, np.array([ee_position[0], ee_position[1], ee_position[2]]))
@@ -262,3 +266,6 @@ class Qube:
 
         return transformed_ee_coordinates
 
+if __name__ == "__main__":
+    qube_obj = Qube(qube_connected=False)
+    qube_obj.kinematics(theta=0, alpha=0, plotted=True)
