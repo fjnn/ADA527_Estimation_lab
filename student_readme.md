@@ -52,7 +52,7 @@ At this point, you should take a decision. Are you planning to **observe the the
 
 2. Or we can extract pixel positions, and they can be our observation. Then, our observer equations would rather be like in this format:
 
-![](C:\Users\gizem\AppData\Roaming\marktext\images\2024-03-27-14-48-04-image.png)    where x and y are the pixel positions on our recorded image/video and shown as the blue circle in the picture above. 
+![](C:\Users\gizem\AppData\Roaming\marktext\images\2024-04-02-10-03-48-image.png)    where x and y are the pixel positions on our recorded image/video and shown as the blue circle in the picture above. 
 
 **Disclaimer**: The first method might given you better estimation results. You could/should EKF or UKF instead but due to "various limitations", we will go with the second method and use linear Kalman filter in this lab. However, you are given the equations and a lot of source code material. You can try the first method later at home and I'd be happy to support you whenever you need help.
 
@@ -108,7 +108,7 @@ Since we decided to observe pixel positions, the procedure will be like this:
 
 6. Therefore, our observation can be represented like this:
    
-   ![](C:\Users\gizem\AppData\Roaming\marktext\images\2024-03-27-17-26-32-image.png)
+   ![](C:\Users\gizem\AppData\Roaming\marktext\images\2024-04-02-10-01-48-image.png)
    
    Find the elements of matrix C:
    
