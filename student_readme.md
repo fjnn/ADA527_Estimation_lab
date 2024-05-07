@@ -100,7 +100,7 @@ Since we decided to observe pixel positions, the procedure will be like this:
 
 5. Realize that we simplified the system model from pendulum angles to pixel tracking:
    
-   ![](C:\Users\gizem\AppData\Roaming\marktext\images\2024-03-27-17-24-44-image.png)
+   ![](C:\Users\gizem\Documents\Git-workspace\ADA527_Estimation_lab\images\2024-03-27-17-24-44-image.png)
    
    Find the elements of matrix A:
    
