@@ -37,8 +37,6 @@ def main():
     df_estimated_positions = pd.DataFrame(columns=['Time', 'estimated_positions'])
     for i in range(1, len(time_list)):
         # Predict
-        # print(i)
-        # print(pixels_from_encoder[0])
         kf.predict(pixels_from_encoder[i-1])
         
         # Update with measurement

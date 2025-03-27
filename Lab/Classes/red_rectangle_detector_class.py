@@ -77,27 +77,16 @@ class RedRectangle:
             box = cv2.boxPoints(rect)
             box = np.int0(box)
 
+            self.measured_width_pixels = abs(min(box[:,0]) - max(box[:,0]))
+            self.measured_height_pixels = abs(min(box[:,1]) - max(box[:,1]))
+
             # Draw the rotated rectangle
             cv2.drawContours(frame, [box], 0, (0, 255, 0), 2)
 
             # Fin the center
             x, y, w, h = cv2.boundingRect(max_contour)
-            # # Get the endpoints of the bounding rectangle
-            # top_left = (x, y)
-            # top_right = (x + w, y)
-            # bottom_left = (x, y + h)
-            # bottom_right = (x + w, y + h)            
-            top_left = box[1]
-            top_right = box[2]
-            bottom_left = box[0]
-            bottom_right = box[3]
-
-            # Calculate the distance between the top and bottom sides
-            self.measured_width_pixels = abs(min(box[:,0]) - max(box[:,0]))
-            self.measured_height_pixels = abs(min(box[:,1]) - max(box[:,1]))
-            # self.measured_height_pixels = np.sqrt((top_right[0] - bottom_right[0])**2 + (top_right[1] - bottom_right[1])**2)
-            # self.measured_width_pixels = np.sqrt((bottom_right[0] - bottom_left[0])**2 + (bottom_right[1] - bottom_left[1])**2)
-            # Calculate the middle point of the rectangle
+            
+            # Calculate the middle point of the rectangle using x,y,w and h.
             middle_x = x + w // 2
             middle_y = y + h // 2
             self.middle_point = (middle_x, middle_y)
