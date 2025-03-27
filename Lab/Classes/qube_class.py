@@ -85,7 +85,7 @@ class Qube:
             self.other_buffer = np.zeros(len(self.other_channels_read), dtype=np.float64)
 
             #If you want to change any board-specific options, it can be done here
-            #card.set_card_specific_options("deadband_compensation=0.65, pwm_en=0, enc0_velocity=3q.0, enc1_velocity=3.0", 4)
+            #self.card.set_card_specific_options("deadband_compensation=0.65, pwm_en=0, enc0_velocity=3q.0, enc1_velocity=3.0", 4)
             self.card.set_card_specific_options("deadband_compensation=0.65", MAX_STRING_LENGTH) 
 
             try:
@@ -230,11 +230,8 @@ class Qube:
         ## Qube+Pendulum is like the second robot
         theta = theta
         alpha = alpha
-        # T_w_motor = Link(ET.tz(l3) * ET.Rz(theta))
-        # T_motor_rodCOM = Link(ET.Rz(0) * ET.tx(l4) * ET.ty(l5*np.sin(alpha)) * ET.tz(l3-l5*np.cos(alpha)))
-        # robot = rtb.Robot([T_w_motor, T_motor_rodCOM], name="qube robot")
 
-        # joint1 = rtb.RevoluteDH(d=0, a=0, alpha=0, offset=0, qlim=(-0.01, 0.01))
+
         joint1 = rtb.RevoluteDH(d=self.l3, alpha=np.pi/2, a=0, offset=np.pi, qlim=(-np.pi, np.pi))
         joint2 = rtb.RevoluteDH(d=self.l4, alpha=np.pi/2, a=0, offset=-np.pi, qlim=(-np.pi, np.pi))
         ee = rtb.RevoluteDH(d=self.l5, a=0, alpha=0, offset=0, qlim=(-0.01, 0.01))
