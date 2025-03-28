@@ -83,7 +83,7 @@ class RedRectangle:
             # Draw the rotated rectangle
             cv2.drawContours(frame, [box], 0, (0, 255, 0), 2)
 
-            # Fin the center
+            # Find the center
             x, y, w, h = cv2.boundingRect(max_contour)
             
             # Calculate the middle point of the rectangle using x,y,w and h.

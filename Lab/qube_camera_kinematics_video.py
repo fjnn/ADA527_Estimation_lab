@@ -62,9 +62,11 @@ cwd = os.getcwd()
 cwd_calib = cwd+'\\Lab\\calibration\\'
 
 # Locate your recorded video
-video_path = cwd+'\\Lab\\recorded_data\\'
-input_video_path = video_path+'output_video3.mp4'
+video_path = cwd+'\\Lab\\recorded_data_lab\\'
+input_video_path = video_path+'input_video.mp4'
 cap = cv2.VideoCapture(input_video_path) ## Use cv2.VideoCapture(1) for real camera.
+output_video_path = video_path+'output_video_with_encoders.mp4'
+
 
 
 with open(os.path.join(cwd_calib, 'calibration_matrix.yaml'), 'r') as stream:
@@ -89,7 +91,7 @@ cap = cv2.VideoCapture(1) ## Use cv2.VideoCapture(1) for real camera.
 rectangle_detector = RedRectangle()
 pixel_capture = PixelToWorldCoordinates(cap=cap, cwd=cwd, calib_file_name='calibration_matrix.yaml')
 qube_object = Qube()
-recorder_object = Recorder(cap, output_filename='output_video_with_encoders.mp4')
+recorder_object = Recorder(cap, output_filename=output_video_path)
 record_duration = 30
 
 
@@ -112,7 +114,7 @@ while True:
     detected_frame, com_coordinates_from_video, com_pixels_from_video = com_from_video_frame(undistorted_frame, rectangle_detector)
 
     # Record video and data
-    recorder_object.record_data(com_pixels_from_encoder, com_pixels_from_video)
+    recorder_object.record_data(com_pixels_from_encoder, com_pixels_from_video, encoder_readings)
     recorder_object.record_video(frame)
     print(recorder_object.elapsed_time)
 
@@ -135,7 +137,8 @@ while True:
 
 print("KeyboardInterrupt received. Exiting...")
 
-recorder_object.save_to_csv(csv_file_name='recoded_data.csv')
+csv_path= video_path+'recorded_data.csv'
+recorder_object.save_to_csv(csv_file_name=csv_path)
 cap.release()
 recorder_object.out.release()
 qube_object.close_all()
